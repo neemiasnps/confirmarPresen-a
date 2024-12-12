@@ -31,7 +31,6 @@ function loadSheetData() {
   const lojasRange = "Lojas!B2:B";
   const fornecedoresRange = "Fornecedores!A2:A";
 
-  // Carregar as listas de lojas e fornecedores
   Promise.all([
     gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: lojasRange }),
     gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: fornecedoresRange })
@@ -44,6 +43,8 @@ function loadSheetData() {
 }
 
 // Função genérica para preencher um select
+definir ao final o select
+definir variaveis diretamente
 function preencherSelect(valores, selectId) {
   const selectElement = document.getElementById(selectId);
   selectElement.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
@@ -53,6 +54,7 @@ function preencherSelect(valores, selectId) {
     option.innerText = valor[0];
     selectElement.appendChild(option);
   });
+  // Reinitialize Materialize select
   M.FormSelect.init(selectElement);
 }
 
@@ -114,8 +116,14 @@ document.getElementById("formulario").addEventListener("submit", function(event)
 
 // Inicializar Materialize e carregar os dados da planilha
 document.addEventListener('DOMContentLoaded', function() {
-  M.FormSelect.init(document.querySelectorAll('select'));
-  M.Datepicker.init(document.querySelectorAll('.datepicker'), {
+  console.log("Inicializando Materialize...");
+
+  // Inicializar selects e datepickers
+  const selects = document.querySelectorAll('select');
+  M.FormSelect.init(selects);
+
+  const datepickers = document.querySelectorAll('.datepicker');
+  M.Datepicker.init(datepickers, {
     format: 'dd/mm/yyyy',
     i18n: {
       months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
@@ -124,5 +132,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  gapi.load("client", () => initAndAuthenticate().then(loadSheetData));
+  console.log("Carregando GAPI...");
+  gapi.load("client", () => initAndAuthenticate().then(() => {
+    console.log("Dados da planilha serão carregados.");
+    loadSheetData();
+  }));
 });
