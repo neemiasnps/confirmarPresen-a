@@ -4,6 +4,7 @@ const CLIENT_ID = "111240662640-4qiildanoi5dp786qaq9dg9s6in3i61u.apps.googleuser
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
 // Inicializa o cliente GAPI para autenticação
+function initAndAuthenticate() {
   return new Promise((resolve, reject) => {
     gapi.load('client:auth2', () => {
       gapi.auth2.init({
@@ -33,34 +34,33 @@ function loadSheetData() {
   // Usar a chave de autenticação do gapi para carregar os dados com autenticação
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: lojasRange,
-    key: API_KEY
+    range: lojasRange
   }).then(response => {
     preencherSelect(response.result.values || [], 'loja');
   });
 
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: fornecedoresRange,
-    key: API_KEY
+    range: fornecedoresRange
   }).then(response => {
     preencherSelect(response.result.values || [], 'fornecedor');
   }).catch(error => {
     console.error("Erro ao carregar dados da planilha:", error);
   });
 }
-// Função genérica para preencher um select
+
+// Função genérica para preencher o select
 function preencherSelect(valores, selectId) {
   const selectElement = document.getElementById(selectId);
-  selectElement.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
-  valores.forEach(valor => {
+  selectElement.innerHTML = '';  // Limpa o conteúdo anterior
+  
+  valores.forEach(value => {
     const option = document.createElement('option');
-    option.value = valor[0];
-    option.innerText = valor[0];
+    option.textContent = value[0];  // Assume que os valores são um array com uma string
     selectElement.appendChild(option);
   });
-  // Reinitialize Materialize select
-  M.FormSelect.init(selectElement);
+
+  M.FormSelect.init(selectElement);  // Inicializa o select usando Materialize
 }
 
 // Função para carregar os colaboradores de acordo com a loja
@@ -136,6 +136,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  console.log("Carregando dados da planilha sem autenticação...");
+  console.log("Carregando dados da planilha...");
   loadSheetData();
 });
