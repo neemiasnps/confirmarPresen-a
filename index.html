@@ -1,56 +1,96 @@
-<div class="container"> 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmar Presença</title>
+  
+  <!-- Materialize CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+  <!-- Ícones do Google -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  <!-- Estilo Customizado -->
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f4f4f4;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
     <h4 class="center-align">Confirmar Presença</h4>
-    
+
     <form id="formulario">
       <!-- Lista Suspensa de Loja -->
       <div class="row">
-      <div class="input-field">
-        <i class="material-icons prefix">store</i>
-        <select id="loja" name="loja">
-          <option value="" disabled selected>Selecione sua loja</option>
-        </select>
-        <label for="loja">Loja</label>
-      </div>
+        <div class="input-field col s12">
+          <i class="material-icons prefix">store</i>
+          <select id="loja" name="loja">
+            <option value="" disabled selected>Selecione sua loja</option>
+          </select>
+          <label for="loja">Loja</label>
+        </div>
       </div>
 
       <!-- Lista Suspensa de Nome -->
       <div class="row">
-      <div class="input-field">
-         <i class="material-icons prefix">account_circle</i>
-         <select id="nome" name="nome">
-          <option value="" disabled selected>Selecione o seu nome</option>
-        </select>
-        <label for="nome">Nome</label>
-      </div>
+        <div class="input-field col s12">
+          <i class="material-icons prefix">account_circle</i>
+          <select id="nome" name="nome">
+            <option value="" disabled selected>Selecione o seu nome</option>
+          </select>
+          <label for="nome">Nome</label>
+        </div>
       </div>
 
       <!-- Lista Suspensa de Fornecedor -->
       <div class="row">
-      <div class="input-field">
-        <i class="material-icons prefix">local_shipping</i>
-         <select id="fornecedor" name="fornecedor">
-          <option value="" disabled selected>Selecione o fornecedor</option>
-        </select>
-        <label for="fornecedor">Fornecedor</label>
-      </div>
+        <div class="input-field col s12">
+          <i class="material-icons prefix">local_shipping</i>
+          <select id="fornecedor" name="fornecedor">
+            <option value="" disabled selected>Selecione o fornecedor</option>
+          </select>
+          <label for="fornecedor">Fornecedor</label>
+        </div>
       </div>
 
       <!-- Campo de Data -->
       <div class="row">
-      <div class="input-field">
-        <i class="material-icons prefix">calendar_today</i>
-        <input type="text" class="datepicker" id="data" name="data" />
-        <label for="data">Selecione a data</label>
-      </div>
+        <div class="input-field col s12">
+          <i class="material-icons prefix">calendar_today</i>
+          <input type="text" class="datepicker" id="data" name="data">
+          <label for="data">Selecione a data</label>
+        </div>
       </div>
 
       <!-- Botão de Enviar -->
       <div class="row">
-      <div class="center-align">
-        <button class="btn waves-effect waves-light" type="submit">Enviar</button>
-      </div>
+        <div class="center-align col s12">
+          <button class="btn waves-effect waves-light" type="submit">
+            Enviar
+            <i class="material-icons right">send</i>
+          </button>
+        </div>
       </div>
     </form>
-</div>
+  </div>
 
-<script src="script.js"></script>
+  <!-- Materialize JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <!-- Google API Client -->
+  <script src="https://apis.google.com/js/api.js"></script>
+  <!-- Arquivo JavaScript Personalizado -->
+  <script src="seu_arquivo.js"></script>
+</body>
+</html>
