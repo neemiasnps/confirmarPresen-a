@@ -1,0 +1,54 @@
+<div class="container"> 
+    <h4 class="center-align">Confirmar Presença</h4>
+    
+    <form id="formulario">
+      <!-- Lista Suspensa de Loja -->
+      <div class="row">
+      <div class="input-field">
+        <i class="material-icons prefix">store</i>
+        <select id="loja" name="loja">
+          <option value="" disabled selected>Selecione sua loja</option>
+        </select>
+        <label for="loja">Loja</label>
+      </div>
+      </div>
+
+      <!-- Lista Suspensa de Nome -->
+      <div class="row">
+      <div class="input-field">
+         <i class="material-icons prefix">account_circle</i>
+         <select id="nome" name="nome">
+          <option value="" disabled selected>Selecione o seu nome</option>
+        </select>
+        <label for="nome">Nome</label>
+      </div>
+      </div>
+
+      <!-- Lista Suspensa de Fornecedor -->
+      <div class="row">
+      <div class="input-field">
+        <i class="material-icons prefix">local_shipping</i>
+         <select id="fornecedor" name="fornecedor">
+          <option value="" disabled selected>Selecione o fornecedor</option>
+        </select>
+        <label for="fornecedor">Fornecedor</label>
+      </div>
+      </div>
+
+      <!-- Campo de Data -->
+      <div class="row">
+      <div class="input-field">
+        <i class="material-icons prefix">calendar_today</i>
+        <input type="text" class="datepicker" id="data" name="data" />
+        <label for="data">Selecione a data</label>
+      </div>
+      </div>
+
+      <!-- Botão de Enviar -->
+      <div class="row">
+      <div class="center-align">
+        <button class="btn waves-effect waves-light" type="submit">Enviar</button>
+      </div>
+      </div>
+    </form>
+</div>
