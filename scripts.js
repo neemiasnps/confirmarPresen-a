@@ -8,21 +8,21 @@ function initAndAuthenticate() {
   return new Promise((resolve, reject) => {
     gapi.load('client:auth2', () => {
       gapi.auth2.init({
-        client_id: CLIENT_ID,
-        scope: SCOPES
-      }).then(() => {
-        const GoogleAuth = gapi.auth2.getAuthInstance();
-        
-        // Verifica se o usuário já está autenticado
-        if (GoogleAuth.isSignedIn.get()) {
-          resolve();
-        } else {
-          GoogleAuth.signIn().then(resolve, reject); // Solicita autenticação se necessário
-        }
-      });
-    });
-  });
-}
+  client_id: CLIENT_ID,
+  scope: SCOPES
+}).then(() => {
+  const GoogleAuth = gapi.auth2.getAuthInstance();
+  
+  if (GoogleAuth.isSignedIn.get()) {
+    resolve();
+  } else {
+    GoogleAuth.signIn().then(resolve, reject);
+  }
+}).catch((error) => {
+  console.error("Erro de autenticação:", error);
+  alert("Falha na autenticação. Verifique as configurações.");
+  reject(error);
+});
 
 // Função para carregar os dados da planilha sem autenticação
 function loadSheetData() {
