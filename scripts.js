@@ -20,11 +20,13 @@ function initAndAuthenticate() {
         resolve();
       }).catch(error => {
         console.error("Erro durante inicialização/autenticação:", error);
+        alert(`Erro de autenticação: ${error.details}`);
         reject(error);
       });
     });
   });
 }
+
 
 // Função para carregar os dados da planilha
 function loadSheetData() {
