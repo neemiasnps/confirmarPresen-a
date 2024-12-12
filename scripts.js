@@ -4,47 +4,51 @@ const CLIENT_ID = "111240662640-4qiildanoi5dp786qaq9dg9s6in3i61u.apps.googleuser
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
 // Inicializa o cliente GAPI para autenticação
-function initAndAuthenticate() {
   return new Promise((resolve, reject) => {
-    gapi.load("client:auth2", () => {
-      gapi.client.init({
-        apiKey: API_KEY,
-        clientId: CLIENT_ID,
-        scope: SCOPES,
-        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
+    gapi.load('client:auth2', () => {
+      gapi.auth2.init({
+        client_id: CLIENT_ID,
+        scope: SCOPES
       }).then(() => {
-        console.log("GAPI client initialized.");
-        return gapi.auth2.getAuthInstance().signIn();
-      }).then(() => {
-        console.log("Usuário autenticado.");
-        resolve();
-      }).catch(error => {
-        console.error("Erro durante autenticação:", error);
-        alert(`Erro de autenticação: ${error.details}`);
-        reject(error);
+        const GoogleAuth = gapi.auth2.getAuthInstance();
+        
+        // Verifica se o usuário já está autenticado
+        if (GoogleAuth.isSignedIn.get()) {
+          resolve();
+        } else {
+          GoogleAuth.signIn().then(resolve, reject); // Solicita autenticação se necessário
+        }
       });
     });
   });
 }
 
-// Função para carregar os dados da planilha sem autenticação
+// Função para carregar os dados da planilha com autenticação
 function loadSheetData() {
   const lojasRange = "Lojas!B2:B";
   const fornecedoresRange = "Fornecedores!A2:A";
 
   const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
   
-  Promise.all([
-    fetch(`${urlBase}${lojasRange}?key=${API_KEY}`).then(res => res.json()),
-    fetch(`${urlBase}${fornecedoresRange}?key=${API_KEY}`).then(res => res.json())
-  ]).then(([lojasResponse, fornecedoresResponse]) => {
-    preencherSelect(lojasResponse.values || [], 'loja');
-    preencherSelect(fornecedoresResponse.values || [], 'fornecedor');
+  // Usar a chave de autenticação do gapi para carregar os dados com autenticação
+  gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: lojasRange,
+    key: API_KEY
+  }).then(response => {
+    preencherSelect(response.result.values || [], 'loja');
+  });
+
+  gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: fornecedoresRange,
+    key: API_KEY
+  }).then(response => {
+    preencherSelect(response.result.values || [], 'fornecedor');
   }).catch(error => {
     console.error("Erro ao carregar dados da planilha:", error);
   });
 }
-
 // Função genérica para preencher um select
 function preencherSelect(valores, selectId) {
   const selectElement = document.getElementById(selectId);
