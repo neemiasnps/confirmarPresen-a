@@ -6,22 +6,19 @@ const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 // Inicializa o cliente GAPI para autenticação
 function initAndAuthenticate() {
   return new Promise((resolve, reject) => {
-    gapi.load("client:auth2", () => {
-      gapi.client.init({
-        apiKey: API_KEY,
-        clientId: CLIENT_ID,
-        scope: SCOPES,
-        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
+    gapi.load('client:auth2', () => {
+      gapi.auth2.init({
+        client_id: CLIENT_ID,
+        scope: SCOPES
       }).then(() => {
-        console.log("GAPI client initialized.");
-        return gapi.auth2.getAuthInstance().signIn();
-      }).then(() => {
-        console.log("Usuário autenticado.");
-        resolve();
-      }).catch(error => {
-        console.error("Erro durante autenticação:", error);
-        alert(`Erro de autenticação: ${error.details}`);
-        reject(error);
+        const GoogleAuth = gapi.auth2.getAuthInstance();
+        
+        // Verifica se o usuário já está autenticado
+        if (GoogleAuth.isSignedIn.get()) {
+          resolve();
+        } else {
+          GoogleAuth.signIn().then(resolve, reject); // Solicita autenticação se necessário
+        }
       });
     });
   });
@@ -34,29 +31,35 @@ function loadSheetData() {
 
   const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
   
-  Promise.all([
-    fetch(`${urlBase}${lojasRange}?key=${API_KEY}`).then(res => res.json()),
-    fetch(`${urlBase}${fornecedoresRange}?key=${API_KEY}`).then(res => res.json())
-  ]).then(([lojasResponse, fornecedoresResponse]) => {
-    preencherSelect(lojasResponse.values || [], 'loja');
-    preencherSelect(fornecedoresResponse.values || [], 'fornecedor');
+  // Usar a chave de autenticação do gapi para carregar os dados com autenticação
+  gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: lojasRange
+  }).then(response => {
+    preencherSelect(response.result.values || [], 'loja');
+  });
+
+  gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: fornecedoresRange
+  }).then(response => {
+    preencherSelect(response.result.values || [], 'fornecedor');
   }).catch(error => {
     console.error("Erro ao carregar dados da planilha:", error);
   });
 }
 
-// Função genérica para preencher um select
 function preencherSelect(valores, selectId) {
   const selectElement = document.getElementById(selectId);
-  selectElement.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
-  valores.forEach(valor => {
+  selectElement.innerHTML = '';  // Limpa o conteúdo anterior
+  
+  valores.forEach(value => {
     const option = document.createElement('option');
-    option.value = valor[0];
-    option.innerText = valor[0];
+    option.textContent = value[0];  // Assume que os valores são um array com uma string
     selectElement.appendChild(option);
   });
-  // Reinitialize Materialize select
-  M.FormSelect.init(selectElement);
+
+  M.FormSelect.init(selectElement);  // Inicializa o select usando Materialize
 }
 
 // Função para carregar os colaboradores de acordo com a loja
@@ -132,6 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  console.log("Carregando dados da planilha sem autenticação...");
+  console.log("Carregando dados da planilha...");
   loadSheetData();
 });
