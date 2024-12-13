@@ -30,7 +30,14 @@ function initializeTokenClient() {
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
-        callback: "", // Callback configurado dinamicamente
+        callback: (response) => {
+            if (response.error) {
+                console.error("Erro durante a autenticação:", response);
+                alert("Erro na autenticação. Verifique as configurações.");
+            } else {
+                console.log("Autenticação bem-sucedida!");
+            }
+        },
     });
 }
 
@@ -53,7 +60,7 @@ function authenticateAndSend(formData) {
     tokenClient.requestAccessToken();
 }
 
-// Autenticar e enviar dados
+// Função para autenticar e enviar dados
 function authenticateAndSend(formData) {
     if (!gapiInitialized) {
         alert("Erro: O GAPI Client não foi inicializado.");
@@ -88,6 +95,7 @@ function loadSheetData() {
         })
         .catch((error) => {
             console.error("Erro ao carregar dados da planilha:", error);
+            alert("Erro ao carregar dados. Tente novamente mais tarde.");
         });
 }
 
@@ -136,12 +144,7 @@ function enviarDados(formData) {
         .then((response) => {
             console.log("Dados enviados com sucesso:", response);
             alert("Dados enviados com sucesso!");
-
-            // Limpar os campos do formulário após o envio
-            document.getElementById("loja").value = "";
-            document.getElementById("nome").value = "";
-            document.getElementById("fornecedor").value = "";
-            document.getElementById("data").value = "";  // Limpar o campo de data
+            limparFormulario();
         })
         .catch((error) => {
             console.error("Erro ao enviar dados:", error);
@@ -155,51 +158,34 @@ document.getElementById("loja").addEventListener("change", (event) => {
     loadNomes(lojaSelecionada);
 });
 
+// Função para limpar o formulário
+function limparFormulario() {
+    document.getElementById("loja").value = "";
+    document.getElementById("nome").value = "";
+    document.getElementById("fornecedor").value = "";
+    document.getElementById("data").value = "";
+    M.FormSelect.init(document.querySelectorAll("select"));
+}
+
 // Inicialização da aplicação
 document.addEventListener("DOMContentLoaded", () => {
-    // Inicializar o cliente GAPI e token client
-    //initializeGapiClient();
-    //initializeTokenClient();
+    initializeGapiClient();
+    initializeTokenClient();
 
     // Inicializar selects do Materialize
-    const selects = document.querySelectorAll('select');
-    M.FormSelect.init(selects);
+    M.FormSelect.init(document.querySelectorAll("select"));
 
     // Inicializar datepickers do Materialize
-    const datepickers = document.querySelectorAll('.datepicker');
-    M.Datepicker.init(datepickers, {
-        format: 'dd/mm/yyyy',
+    M.Datepicker.init(document.querySelectorAll(".datepicker"), {
+        format: "dd/mm/yyyy",
         autoClose: true,
-        defaultDate: new Date(),
-        setDefaultDate: true,
-        i18n: {
-            months: [
-                'Janeiro', 'Fevereiro', 'Março', 'Abril', 
-                'Maio', 'Junho', 'Julho', 'Agosto', 
-                'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-            ],
-            monthsShort: [
-                'Jan', 'Fev', 'Mar', 'Abr', 
-                'Mai', 'Jun', 'Jul', 'Ago', 
-                'Set', 'Out', 'Nov', 'Dez'
-            ],
-            weekdays: [
-                'Domingo', 'Segunda-feira', 'Terça-feira', 
-                'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'
-            ],
-            weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
-            weekdaysAbbrev: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
-            today: 'Hoje',
-            clear: 'Limpar',
-            done: 'Ok'
-        }
     });
 
     // Carregar dados da planilha
     loadSheetData();
 
     // Configurar envio do formulário
-    document.getElementById("formulario").addEventListener("submit", function (event) {
+    document.getElementById("formulario").addEventListener("submit", (event) => {
         event.preventDefault();
 
         const loja = document.getElementById("loja").value;
@@ -208,8 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = document.getElementById("data").value;
 
         if (loja && nome && fornecedor && data) {
-            const formData = { loja, nome, fornecedor, data };
-            authenticateAndSend(formData);
+            authenticateAndSend({ loja, nome, fornecedor, data });
         } else {
             alert("Por favor, preencha todos os campos.");
         }
