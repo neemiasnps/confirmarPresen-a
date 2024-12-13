@@ -6,7 +6,7 @@ const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 let gapiInitialized = false;
 let tokenClient;
 
-// Inicializa o cliente GAPI para autenticação
+// Função para inicializar o cliente GAPI
 function initializeGapiClient() {
     gapi.load("client", () => {
         gapi.client
@@ -20,6 +20,7 @@ function initializeGapiClient() {
             })
             .catch((error) => {
                 console.error("Erro ao inicializar o GAPI Client:", error);
+                alert("Erro ao inicializar o GAPI Client.");
             });
     });
 }
@@ -31,6 +32,25 @@ function initializeTokenClient() {
         scope: SCOPES,
         callback: "", // Callback configurado dinamicamente
     });
+}
+
+// Autenticar e enviar dados
+function authenticateAndSend(formData) {
+    if (!gapiInitialized) {
+        alert("Erro: O GAPI Client não foi inicializado.");
+        return;
+    }
+
+    tokenClient.callback = (response) => {
+        if (response.error) {
+            console.error("Erro durante a autenticação:", response);
+            alert("Erro na autenticação. Verifique as configurações.");
+            return;
+        }
+        enviarDados(formData);
+    };
+
+    tokenClient.requestAccessToken();
 }
 
 // Autenticar e enviar dados
@@ -137,6 +157,9 @@ document.getElementById("loja").addEventListener("change", (event) => {
 
 // Inicialização da aplicação
 document.addEventListener("DOMContentLoaded", () => {
+    // Inicializar o cliente GAPI e token client
+    initializeGapiClient();
+    initializeTokenClient();
 
     // Inicializar selects do Materialize
     const selects = document.querySelectorAll('select');
@@ -146,9 +169,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const datepickers = document.querySelectorAll('.datepicker');
     M.Datepicker.init(datepickers, {
         format: 'dd/mm/yyyy',
-        autoClose: true, // Fecha automaticamente após selecionar uma data
-        defaultDate: new Date(), // Define a data atual como padrão
-        setDefaultDate: true, // Ativa a exibição da data padrão
+        autoClose: true,
+        defaultDate: new Date(),
+        setDefaultDate: true,
         i18n: {
             months: [
                 'Janeiro', 'Fevereiro', 'Março', 'Abril', 
@@ -171,10 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
             done: 'Ok'
         }
     });
-
-    // Inicializar clientes do Google API
-    initializeGapiClient();
-    initializeTokenClient();
 
     // Carregar dados da planilha
     loadSheetData();
