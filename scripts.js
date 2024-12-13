@@ -6,19 +6,22 @@ const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 // Inicializa o cliente GAPI para autenticação
 function initAndAuthenticate() {
   return new Promise((resolve, reject) => {
-    gapi.load('client:auth2', () => {
-      gapi.auth2.init({
-        client_id: CLIENT_ID,
-        scope: SCOPES
+    gapi.load("client:auth2", () => {
+      gapi.client.init({
+        apiKey: API_KEY,
+        clientId: CLIENT_ID,
+        scope: SCOPES,
+        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
       }).then(() => {
-        const GoogleAuth = gapi.auth2.getAuthInstance();
-        
-        // Verifica se o usuário já está autenticado
-        if (GoogleAuth.isSignedIn.get()) {
-          resolve();
-        } else {
-          GoogleAuth.signIn().then(resolve, reject); // Solicita autenticação se necessário
-        }
+        console.log("GAPI client initialized.");
+        return gapi.auth2.getAuthInstance().signIn();
+      }).then(() => {
+        console.log("Usuário autenticado.");
+        resolve();
+      }).catch(error => {
+        console.error("Erro durante autenticação:", error);
+        alert(`Erro de autenticação: ${error.details}`);
+        reject(error);
       });
     });
   });
@@ -29,43 +32,37 @@ function loadSheetData() {
   const lojasRange = "Lojas!B2:B";
   const fornecedoresRange = "Fornecedores!A2:A";
 
-  const urlBase = https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/;
+  const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
   
-  // Usar a chave de autenticação do gapi para carregar os dados com autenticação
-  gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: lojasRange
-  }).then(response => {
-    preencherSelect(response.result.values || [], 'loja');
-  });
-
-  gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: fornecedoresRange
-  }).then(response => {
-    preencherSelect(response.result.values || [], 'fornecedor');
+  Promise.all([
+    fetch(`${urlBase}${lojasRange}?key=${API_KEY}`).then(res => res.json()),
+    fetch(`${urlBase}${fornecedoresRange}?key=${API_KEY}`).then(res => res.json())
+  ]).then(([lojasResponse, fornecedoresResponse]) => {
+    preencherSelect(lojasResponse.values || [], 'loja');
+    preencherSelect(fornecedoresResponse.values || [], 'fornecedor');
   }).catch(error => {
     console.error("Erro ao carregar dados da planilha:", error);
   });
 }
 
+// Função genérica para preencher um select
 function preencherSelect(valores, selectId) {
   const selectElement = document.getElementById(selectId);
-  selectElement.innerHTML = '';  // Limpa o conteúdo anterior
-  
-  valores.forEach(value => {
+  selectElement.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
+  valores.forEach(valor => {
     const option = document.createElement('option');
-    option.textContent = value[0];  // Assume que os valores são um array com uma string
+    option.value = valor[0];
+    option.innerText = valor[0];
     selectElement.appendChild(option);
   });
-
-  M.FormSelect.init(selectElement);  // Inicializa o select usando Materialize
+  // Reinitialize Materialize select
+  M.FormSelect.init(selectElement);
 }
 
 // Função para carregar os colaboradores de acordo com a loja
 function loadNomes(lojaSelecionada) {
   const range = "Colaboradores!A2:C";
-  const url = https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY};
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
 
   fetch(url).then(res => res.json()).then(response => {
     const colaboradores = response.values || [];
@@ -135,6 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  console.log("Carregando dados da planilha...");
+  console.log("Carregando dados da planilha sem autenticação...");
   loadSheetData();
 });
