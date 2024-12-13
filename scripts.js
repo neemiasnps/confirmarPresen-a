@@ -26,8 +26,8 @@ function initializeGapiClient() {
 
 // Inicializar o cliente de token OAuth2
 function initializeTokenClient() {
-    if (typeof google === "undefined" || !google.accounts || !google.accounts.oauth2) {
-        console.error("Erro: O script GSI não foi carregado ou está incorreto.");
+    if (typeof google === "undefined" || !google.accounts) {
+        console.error("Erro: O script GSI não foi carregado.");
         return;
     }
     tokenClient = google.accounts.oauth2.initTokenClient({
@@ -114,8 +114,7 @@ function loadNomes(lojaSelecionada) {
 
 // Função para enviar dados para a planilha
 function enviarDados(formData) {
-    const range = "Confirmação!A2:E";
-    //const dataAtual = new Date().toLocaleDateString("pt-BR"); // Data atual no formato DD/MM/AAAA
+    const range = "Confirmação!A2:D";
     const dados = [[formData.loja, formData.nome, formData.fornecedor, formData.data]];
 
     gapi.client.sheets.spreadsheets.values
@@ -155,21 +154,22 @@ function limparFormulario() {
 
 // Inicialização da aplicação
 document.addEventListener("DOMContentLoaded", () => {
-    // Inicialize o GAPI Client e o GSI Token Client
     initializeGapiClient();
     initializeTokenClient();
 
-    // Configure Materialize
+    // Inicializar selects do Materialize
     M.FormSelect.init(document.querySelectorAll("select"));
+
+    // Inicializar datepickers do Materialize
     M.Datepicker.init(document.querySelectorAll(".datepicker"), {
         format: "dd/mm/yyyy",
         autoClose: true,
     });
 
-    // Carregue dados da planilha
+    // Carregar dados da planilha
     loadSheetData();
 
-    // Configure envio do formulário
+    // Configurar envio do formulário
     document.getElementById("formulario").addEventListener("submit", (event) => {
         event.preventDefault();
 
