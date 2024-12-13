@@ -26,8 +26,8 @@ function initializeGapiClient() {
 
 // Inicializar o cliente de token OAuth2
 function initializeTokenClient() {
-    if (typeof google === "undefined" || !google.accounts) {
-        console.error("Erro: O script GSI não foi carregado.");
+    if (typeof google === "undefined" || !google.accounts || !google.accounts.oauth2) {
+        console.error("Erro: O script GSI não foi carregado ou está incorreto.");
         return;
     }
     tokenClient = google.accounts.oauth2.initTokenClient({
@@ -154,22 +154,21 @@ function limparFormulario() {
 
 // Inicialização da aplicação
 document.addEventListener("DOMContentLoaded", () => {
+    // Inicialize o GAPI Client e o GSI Token Client
     initializeGapiClient();
     initializeTokenClient();
 
-    // Inicializar selects do Materialize
+    // Configure Materialize
     M.FormSelect.init(document.querySelectorAll("select"));
-
-    // Inicializar datepickers do Materialize
     M.Datepicker.init(document.querySelectorAll(".datepicker"), {
         format: "dd/mm/yyyy",
         autoClose: true,
     });
 
-    // Carregar dados da planilha
+    // Carregue dados da planilha
     loadSheetData();
 
-    // Configurar envio do formulário
+    // Configure envio do formulário
     document.getElementById("formulario").addEventListener("submit", (event) => {
         event.preventDefault();
 
