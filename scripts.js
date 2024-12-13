@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (loja && nome && fornecedor && data) {
             authenticateAndSend({ loja, nome, fornecedor, data });
         } else {
-            alert("Por favor, preencha todos os campos.");
+            confirm("Por favor, preencha todos os campos.");
         }
     });
 });
