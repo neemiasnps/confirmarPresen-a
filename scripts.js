@@ -97,17 +97,22 @@ function preencherSelect(valores, selectId) {
 // Função para carregar nomes de colaboradores com base na loja selecionada
 function loadNomes(lojaSelecionada) {
     const range = "Colaboradores!A2:C";
-    const url = const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
-    
+    const url = `${BASE_URL}${range}?key=${API_KEY}`;
+
     fetch(url)
         .then((res) => res.json())
         .then((response) => {
-            const colaboradores = response.values || [];
-            const nomesFiltrados = colaboradores.filter((colaborador) => colaborador[0] === lojaSelecionada);
-            preencherSelect(nomesFiltrados.map((colaborador) => [colaborador[2]]), "nome");
+            if (response.values) {
+                const colaboradores = response.values;
+                const nomesFiltrados = colaboradores.filter((colaborador) => colaborador[0] === lojaSelecionada);
+                preencherSelect(nomesFiltrados.map((colaborador) => [colaborador[2]]), "nome");
+            } else {
+                console.warn("Nenhum dado encontrado para colaboradores.");
+            }
         })
         .catch((error) => {
             console.error("Erro ao carregar colaboradores:", error);
+            alert("Erro ao carregar colaboradores. Verifique sua conexão.");
         });
 }
 
@@ -147,6 +152,8 @@ function limparFormulario() {
     document.getElementById("fornecedor").value = "";
     document.getElementById("data").value = "";
     M.FormSelect.init(document.querySelectorAll("select"));
+    M.FormSelect.init(document.getElementById("loja"));
+    M.FormSelect.init(document.getElementById("fornecedor"));
 }
 
 // Inicialização da aplicação
