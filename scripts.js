@@ -3,6 +3,27 @@ const API_KEY = "AIzaSyBH6EnOSZlpbyHasVJ4qGO_JRmW9iPwp-A";
 const CLIENT_ID = "111240662640-4qiildanoi5dp786qaq9dg9s6in3i61u.apps.googleusercontent.com";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
+// Inicializa o cliente GAPI para autenticação
+function initAndAuthenticate() {
+  return new Promise((resolve, reject) => {
+    gapi.load('client:auth2', () => {
+      gapi.auth2.init({
+  client_id: CLIENT_ID,
+  scope: SCOPES
+}).then(() => {
+  const GoogleAuth = gapi.auth2.getAuthInstance();
+  
+  if (GoogleAuth.isSignedIn.get()) {
+    resolve();
+  } else {
+    GoogleAuth.signIn().then(resolve, reject);
+  }
+}).catch((error) => {
+  console.error("Erro de autenticação:", error);
+  alert("Falha na autenticação. Verifique as configurações.");
+  reject(error);
+});
+
 // Função para carregar os dados da planilha sem autenticação
 function loadSheetData() {
   gapi.load('client', () => {
@@ -27,7 +48,6 @@ function loadSheetData() {
   });
 }
 
-// Função para preencher um select com os valores recebidos
 function preencherSelect(valores, selectId) {
   const selectElement = document.getElementById(selectId);
   selectElement.innerHTML = '';  // Limpa o conteúdo anterior
@@ -44,7 +64,7 @@ function preencherSelect(valores, selectId) {
 // Função para carregar os colaboradores de acordo com a loja
 function loadNomes(lojaSelecionada) {
   const range = "Colaboradores!A2:C";
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
+  const url = https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY};
 
   fetch(url).then(res => res.json()).then(response => {
     const colaboradores = response.values || [];
@@ -95,30 +115,6 @@ document.getElementById("formulario").addEventListener("submit", function(event)
     alert("Por favor, preencha todos os campos.");
   }
 });
-
-// Função para autenticar apenas na hora de enviar os dados
-function initAndAuthenticate() {
-  return new Promise((resolve, reject) => {
-    gapi.load('client:auth2', () => {
-      gapi.auth2.init({
-        client_id: CLIENT_ID,
-        scope: SCOPES
-      }).then(() => {
-        const GoogleAuth = gapi.auth2.getAuthInstance();
-
-        if (GoogleAuth.isSignedIn.get()) {
-          resolve();
-        } else {
-          GoogleAuth.signIn().then(resolve, reject);
-        }
-      }).catch((error) => {
-        console.error("Erro de autenticação:", error);
-        alert("Falha na autenticação. Verifique as configurações.");
-        reject(error);
-      });
-    });
-  });
-}
 
 // Inicializar Materialize e carregar os dados da planilha
 document.addEventListener('DOMContentLoaded', function() {
