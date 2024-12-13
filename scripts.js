@@ -106,7 +106,9 @@ document.getElementById("formulario").addEventListener("submit", function(event)
 
   if (loja && nome && fornecedor && data) {
     const formData = { loja, nome, fornecedor, data };
-    initAndAuthenticate().then(() => enviarDados(formData));
+    initAndAuthenticate().then(() => enviarDados(formData)).catch(error => {
+      console.error("Erro durante a autenticação:", error);
+    });
   } else {
     alert("Por favor, preencha todos os campos.");
   }
@@ -124,9 +126,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  // Carregar o GAPI client e autenticar
   gapi.load("client", () => {
-  initAndAuthenticate().then(loadSheetData).catch(error => {
-    console.error("Erro na inicialização do GAPI:", error);
+    initAndAuthenticate().then(loadSheetData).catch(error => {
+      console.error("Erro na inicialização do GAPI:", error);
+    });
   });
-});
 });
