@@ -145,13 +145,13 @@ function enviarDados(formData) {
         // Obtendo o e-mail autenticado
         const emailAutenticado = gapi.auth2.getAuthInstance().currentUser.get().getEmail();
         
-        // Obtendo a data atual no formato ISO
-        const dataAtual = new Date().toISOString();
+        // Obtendo a data atual
+        const dataAtual = new Date().toLocaleString(); // Você pode ajustar o formato da data conforme necessário
         
         // Ajustando o intervalo de dados para incluir as colunas E e F
-        const range = "Confirmação!A2:F"; // Ajuste o intervalo conforme necessário
-        
-        // Estrutura de dados a serem enviados
+        const range = "Confirmação!A2:F"; // Ajuste o intervalo para incluir as novas colunas
+
+        // Agora, incluímos o e-mail e a data atual nos dados a serem enviados
         const dados = [[
             formData.loja,
             formData.nome,
@@ -160,10 +160,7 @@ function enviarDados(formData) {
             emailAutenticado,  // Adicionando o e-mail na coluna E
             dataAtual          // Adicionando a data na coluna F
         ]];
-        
-        // Verificação dos dados a serem enviados
-        console.log("Dados a serem enviados:", dados);
-        
+
         // Enviar dados para a planilha
         gapi.client.sheets.spreadsheets.values
             .append({
