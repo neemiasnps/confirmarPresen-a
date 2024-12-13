@@ -8,7 +8,6 @@ let tokenClient;
 
 // Função para inicializar o cliente GAPI
 function initializeGapiClient() {
-    console.log("Tentando inicializar o GAPI Client...");
     gapi.load("client", () => {
         gapi.client
             .init({
@@ -17,7 +16,7 @@ function initializeGapiClient() {
             })
             .then(() => {
                 gapiInitialized = true;
-                console.log("GAPI Client inicializado com sucesso.");
+                console.log("GAPI Client inicializado.");
             })
             .catch((error) => {
                 console.error("Erro ao inicializar o GAPI Client:", error);
@@ -42,7 +41,7 @@ function initializeTokenClient() {
     });
 }
 
-// Autenticar e enviar dados
+// Função para autenticar e enviar dados
 function authenticateAndSend(formData) {
     if (!gapiInitialized) {
         alert("Erro: O GAPI Client não foi inicializado.");
@@ -65,11 +64,11 @@ function authenticateAndSend(formData) {
 function loadSheetData() {
     const lojasRange = "Lojas!B2:B";
     const fornecedoresRange = "Fornecedores!A2:A";
-    const urlBase = https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/;
+    const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
 
     Promise.all([
-        fetch(${urlBase}${lojasRange}?key=${API_KEY}).then((res) => res.json()),
-        fetch(${urlBase}${fornecedoresRange}?key=${API_KEY}).then((res) => res.json()),
+        fetch(`${urlBase}${lojasRange}?key=${API_KEY}`).then((res) => res.json()),
+        fetch(`${urlBase}${fornecedoresRange}?key=${API_KEY}`).then((res) => res.json()),
     ])
         .then(([lojasResponse, fornecedoresResponse]) => {
             preencherSelect(lojasResponse.values || [], "loja");
@@ -92,23 +91,6 @@ function preencherSelect(valores, selectId) {
         selectElement.appendChild(option);
     });
     M.FormSelect.init(selectElement);
-}
-
-// Função para carregar nomes de colaboradores com base na loja selecionada
-function loadNomes(lojaSelecionada) {
-    const range = "Colaboradores!A2:C";
-    const url = https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY};
-
-    fetch(url)
-        .then((res) => res.json())
-        .then((response) => {
-            const colaboradores = response.values || [];
-            const nomesFiltrados = colaboradores.filter((colaborador) => colaborador[0] === lojaSelecionada);
-            preencherSelect(nomesFiltrados.map((colaborador) => [colaborador[2]]), "nome");
-        })
-        .catch((error) => {
-            console.error("Erro ao carregar colaboradores:", error);
-        });
 }
 
 // Função para enviar dados para a planilha
@@ -134,12 +116,6 @@ function enviarDados(formData) {
         });
 }
 
-// Evento para carregar nomes ao selecionar uma loja
-document.getElementById("loja").addEventListener("change", (event) => {
-    const lojaSelecionada = event.target.value;
-    loadNomes(lojaSelecionada);
-});
-
 // Função para limpar o formulário
 function limparFormulario() {
     document.getElementById("loja").value = "";
@@ -153,7 +129,6 @@ function limparFormulario() {
 document.addEventListener("DOMContentLoaded", () => {
     initializeGapiClient();
     initializeTokenClient();
-    limparFormulario();
 
     // Inicializar selects do Materialize
     M.FormSelect.init(document.querySelectorAll("select"));
@@ -170,11 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Configurar envio do formulário
     document.getElementById("formulario").addEventListener("submit", (event) => {
         event.preventDefault();
-
-        if (!gapiInitialized) {
-        alert("Erro: O GAPI Client não foi inicializado corretamente.");
-        return;
-    }
 
         const loja = document.getElementById("loja").value;
         const nome = document.getElementById("nome").value;
