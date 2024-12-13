@@ -96,6 +96,7 @@ function preencherSelect(valores, selectId) {
 
 // Função para carregar nomes de colaboradores com base na loja selecionada
 function loadNomes(lojaSelecionada) {
+    const BASE_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
     const range = "Colaboradores!A2:C";
     const url = `${BASE_URL}${range}?key=${API_KEY}`;
 
