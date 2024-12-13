@@ -132,22 +132,45 @@ document.getElementById("loja").addEventListener("change", (event) => {
 // Inicialização da aplicação
 document.addEventListener("DOMContentLoaded", () => {
 
-    // Inicializar selects e datepickers
-  const selects = document.querySelectorAll('select');
-  M.FormSelect.init(selects);
+    // Inicializar selects do Materialize
+    const selects = document.querySelectorAll('select');
+    M.FormSelect.init(selects);
 
-  const datepickers = document.querySelectorAll('.datepicker');
-  M.Datepicker.init(datepickers, {
-    format: 'dd/mm/yyyy',
-    i18n: {
-      months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-      weekdays: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
-      weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
-    }
-  });
-    
+    // Inicializar datepickers do Materialize
+    const datepickers = document.querySelectorAll('.datepicker');
+    M.Datepicker.init(datepickers, {
+        format: 'dd/mm/yyyy',
+        autoClose: true, // Fecha automaticamente após selecionar uma data
+        defaultDate: new Date(), // Define a data atual como padrão
+        setDefaultDate: true, // Ativa a exibição da data padrão
+        i18n: {
+            months: [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 
+                'Maio', 'Junho', 'Julho', 'Agosto', 
+                'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ],
+            monthsShort: [
+                'Jan', 'Fev', 'Mar', 'Abr', 
+                'Mai', 'Jun', 'Jul', 'Ago', 
+                'Set', 'Out', 'Nov', 'Dez'
+            ],
+            weekdays: [
+                'Domingo', 'Segunda-feira', 'Terça-feira', 
+                'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'
+            ],
+            weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+            weekdaysAbbrev: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
+            today: 'Hoje',
+            clear: 'Limpar',
+            done: 'Ok'
+        }
+    });
+
+    // Inicializar clientes do Google API
     initializeGapiClient();
     initializeTokenClient();
+
+    // Carregar dados da planilha
     loadSheetData();
 
     // Configurar envio do formulário
