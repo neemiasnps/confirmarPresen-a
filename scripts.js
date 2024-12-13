@@ -3,42 +3,60 @@ const API_KEY = "AIzaSyBH6EnOSZlpbyHasVJ4qGO_JRmW9iPwp-A";
 const CLIENT_ID = "111240662640-4qiildanoi5dp786qaq9dg9s6in3i61u.apps.googleusercontent.com";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
-// Função para carregar os dados da planilha sem autenticação
-function loadSheetData() {
-  gapi.load('client', () => {
-    gapi.client.init({
-      apiKey: API_KEY,
-      clientId: CLIENT_ID,
-      scope: SCOPES
-    }).then(() => {
-      // Agora que o cliente está carregado, você pode acessar o Google Sheets
-      gapi.client.sheets.spreadsheets.values.get({
-        spreadsheetId: SHEET_ID,
-        range: 'Lojas!B2:B'
-      }).then(response => {
-        console.log(response);
-        preencherSelect(response.result.values || [], 'loja');
+// Inicializa o cliente GAPI para autenticação
+function initAndAuthenticate() {
+  return new Promise((resolve, reject) => {
+    gapi.load("client:auth2", () => {
+      gapi.client.init({
+        apiKey: API_KEY,
+        clientId: CLIENT_ID,
+        scope: SCOPES,
+        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
+      }).then(() => {
+        console.log("GAPI client initialized.");
+        return gapi.auth2.getAuthInstance().signIn();
+      }).then(() => {
+        console.log("Usuário autenticado.");
+        resolve();
       }).catch(error => {
-        console.error("Erro ao carregar dados da planilha:", error);
+        console.error("Erro durante autenticação:", error);
+        alert(`Erro de autenticação: ${error.details}`);
+        reject(error);
       });
-    }).catch(error => {
-      console.error("Erro ao inicializar o cliente GAPI:", error);
     });
   });
 }
 
-// Função para preencher um select com os valores recebidos
+// Função para carregar os dados da planilha sem autenticação
+function loadSheetData() {
+  const lojasRange = "Lojas!B2:B";
+  const fornecedoresRange = "Fornecedores!A2:A";
+
+  const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
+  
+  Promise.all([
+    fetch(`${urlBase}${lojasRange}?key=${API_KEY}`).then(res => res.json()),
+    fetch(`${urlBase}${fornecedoresRange}?key=${API_KEY}`).then(res => res.json())
+  ]).then(([lojasResponse, fornecedoresResponse]) => {
+    preencherSelect(lojasResponse.values || [], 'loja');
+    preencherSelect(fornecedoresResponse.values || [], 'fornecedor');
+  }).catch(error => {
+    console.error("Erro ao carregar dados da planilha:", error);
+  });
+}
+
+// Função genérica para preencher um select
 function preencherSelect(valores, selectId) {
   const selectElement = document.getElementById(selectId);
-  selectElement.innerHTML = '';  // Limpa o conteúdo anterior
-  
-  valores.forEach(value => {
+  selectElement.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
+  valores.forEach(valor => {
     const option = document.createElement('option');
-    option.textContent = value[0];  // Assume que os valores são um array com uma string
+    option.value = valor[0];
+    option.innerText = valor[0];
     selectElement.appendChild(option);
   });
-
-  M.FormSelect.init(selectElement);  // Inicializa o select usando Materialize
+  // Reinitialize Materialize select
+  M.FormSelect.init(selectElement);
 }
 
 // Função para carregar os colaboradores de acordo com a loja
@@ -96,30 +114,6 @@ document.getElementById("formulario").addEventListener("submit", function(event)
   }
 });
 
-// Função para autenticar apenas na hora de enviar os dados
-function initAndAuthenticate() {
-  return new Promise((resolve, reject) => {
-    gapi.load('client:auth2', () => {
-      gapi.auth2.init({
-        client_id: CLIENT_ID,
-        scope: SCOPES
-      }).then(() => {
-        const GoogleAuth = gapi.auth2.getAuthInstance();
-
-        if (GoogleAuth.isSignedIn.get()) {
-          resolve();
-        } else {
-          GoogleAuth.signIn().then(resolve, reject);
-        }
-      }).catch((error) => {
-        console.error("Erro de autenticação:", error);
-        alert("Falha na autenticação. Verifique as configurações.");
-        reject(error);
-      });
-    });
-  });
-}
-
 // Inicializar Materialize e carregar os dados da planilha
 document.addEventListener('DOMContentLoaded', function() {
   console.log("Inicializando Materialize...");
@@ -138,6 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  console.log("Carregando dados da planilha...");
+  console.log("Carregando dados da planilha sem autenticação...");
   loadSheetData();
 });
