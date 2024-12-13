@@ -138,49 +138,27 @@ function loadNomes(lojaSelecionada) {
         });
 }
 
-//Função enviar dados
+// Função para enviar dados para a planilha
 function enviarDados(formData) {
-    // Verifique se o gapi está carregado e autenticado
-    if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
-        // Obtendo o e-mail autenticado
-        const emailAutenticado = gapi.auth2.getAuthInstance().currentUser.get().getEmail();
-        
-        // Obtendo a data atual
-        const dataAtual = new Date().toLocaleString(); // Você pode ajustar o formato da data conforme necessário
-        
-        // Ajustando o intervalo de dados para incluir as colunas E e F
-        const range = "Confirmação!A2:F"; // Ajuste o intervalo para incluir as novas colunas
+    const range = "Confirmação!A2:D";
+    const dados = [[formData.loja, formData.nome, formData.fornecedor, formData.data]];
 
-        // Agora, incluímos o e-mail e a data atual nos dados a serem enviados
-        const dados = [[
-            formData.loja,
-            formData.nome,
-            formData.fornecedor,
-            formData.data,
-            emailAutenticado,  // Adicionando o e-mail na coluna E
-            dataAtual          // Adicionando a data na coluna F
-        ]];
-
-        // Enviar dados para a planilha
-        gapi.client.sheets.spreadsheets.values
-            .append({
-                spreadsheetId: SHEET_ID,
-                range: range,
-                valueInputOption: "RAW",
-                resource: { values: dados },
-            })
-            .then((response) => {
-                console.log("Dados enviados com sucesso:", response);
-                alert("Dados enviados com sucesso!");
-                limparFormulario();
-            })
-            .catch((error) => {
-                console.error("Erro ao enviar dados:", error);
-                alert("Ocorreu um erro ao enviar os dados.");
-            });
-    } else {
-        alert("Usuário não autenticado. Por favor, faça o login.");
-    }
+    gapi.client.sheets.spreadsheets.values
+        .append({
+            spreadsheetId: SHEET_ID,
+            range: range,
+            valueInputOption: "RAW",
+            resource: { values: dados },
+        })
+        .then((response) => {
+            console.log("Dados enviados com sucesso:", response);
+            alert("Dados enviados com sucesso!");
+            limparFormulario();
+        })
+        .catch((error) => {
+            console.error("Erro ao enviar dados:", error);
+            alert("Ocorreu um erro ao enviar os dados.");
+        });
 }
 
 // Evento para carregar nomes ao selecionar uma loja
