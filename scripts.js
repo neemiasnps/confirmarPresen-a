@@ -112,51 +112,27 @@ function loadNomes(lojaSelecionada) {
         });
 }
 
+// Função para enviar dados para a planilha
 function enviarDados(formData) {
-    // Verifique se o gapi está carregado e autenticado
-    if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
-        // Obtendo o e-mail autenticado
-        const emailAutenticado = gapi.auth2.getAuthInstance().currentUser.get().getEmail();
-        
-        // Obtendo a data atual no formato ISO
-        const dataAtual = new Date().toISOString();
-        
-        // Ajustando o intervalo de dados para incluir as colunas E e F
-        const range = "Confirmação!A2:F"; // Ajuste o intervalo conforme necessário
-        
-        // Estrutura de dados a serem enviados
-        const dados = [[
-            formData.loja,
-            formData.nome,
-            formData.fornecedor,
-            formData.data,
-            emailAutenticado,  // Adicionando o e-mail na coluna E
-            dataAtual          // Adicionando a data na coluna F
-        ]];
-        
-        // Verificação dos dados a serem enviados
-        console.log("Dados a serem enviados:", dados);
-        
-        // Enviar dados para a planilha
-        gapi.client.sheets.spreadsheets.values
-            .append({
-                spreadsheetId: SHEET_ID,
-                range: range,
-                valueInputOption: "RAW",
-                resource: { values: dados },
-            })
-            .then((response) => {
-                console.log("Dados enviados com sucesso:", response);
-                alert("Dados enviados com sucesso!");
-                limparFormulario();
-            })
-            .catch((error) => {
-                console.error("Erro ao enviar dados:", error);
-                alert("Ocorreu um erro ao enviar os dados.");
-            });
-    } else {
-        alert("Usuário não autenticado. Por favor, faça o login.");
-    }
+    const range = "Confirmação!A2:D";
+    const dados = [[formData.loja, formData.nome, formData.fornecedor, formData.data]];
+
+    gapi.client.sheets.spreadsheets.values
+        .append({
+            spreadsheetId: SHEET_ID,
+            range: range,
+            valueInputOption: "RAW",
+            resource: { values: dados },
+        })
+        .then((response) => {
+            console.log("Dados enviados com sucesso:", response);
+            alert("Dados enviados com sucesso!");
+            limparFormulario();
+        })
+        .catch((error) => {
+            console.error("Erro ao enviar dados:", error);
+            alert("Ocorreu um erro ao enviar os dados.");
+        });
 }
 
 // Evento para carregar nomes ao selecionar uma loja
