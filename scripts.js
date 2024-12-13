@@ -97,24 +97,18 @@ function preencherSelect(valores, selectId) {
 
 // Função para carregar nomes de colaboradores com base na loja selecionada
 function loadNomes(lojaSelecionada) {
-    const BASE_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
     const range = "Colaboradores!A2:C";
-    const url = `${BASE_URL}${range}?key=${API_KEY}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
 
     fetch(url)
         .then((res) => res.json())
         .then((response) => {
-            if (response.values) {
-                const colaboradores = response.values;
-                const nomesFiltrados = colaboradores.filter((colaborador) => colaborador[0] === lojaSelecionada);
-                preencherSelect(nomesFiltrados.map((colaborador) => [colaborador[2]]), "nome");
-            } else {
-                console.warn("Nenhum dado encontrado para colaboradores.");
-            }
+            const colaboradores = response.values || [];
+            const nomesFiltrados = colaboradores.filter((colaborador) => colaborador[0] === lojaSelecionada);
+            preencherSelect(nomesFiltrados.map((colaborador) => [colaborador[2]]), "nome");
         })
         .catch((error) => {
             console.error("Erro ao carregar colaboradores:", error);
-            alert("Erro ao carregar colaboradores. Verifique sua conexão.");
         });
 }
 
