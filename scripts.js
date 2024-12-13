@@ -6,22 +6,21 @@ const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 // Inicializa o cliente GAPI e autentica o usuário
 function initAndAuthenticate() {
   return new Promise((resolve, reject) => {
-    gapi.load("client:auth2", () => {
-  gapi.client.init({
-    apiKey: API_KEY,
-    clientId: CLIENT_ID,
-    scope: SCOPES,
-    discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
-  }).then(() => {
-    console.log("GAPI client initialized.");
-    return gapi.auth2.getAuthInstance().signIn();
-  }).then(() => {
-    console.log("Usuário autenticado.");
-    resolve();
-  }).catch(error => {
-    console.error("Erro durante inicialização/autenticação:", error);
-    reject(error);
-  });
+    gapi.load('client:auth2', function() {
+    gapi.client.init({
+        apiKey: 'YOUR_API_KEY',
+        clientId: 'YOUR_CLIENT_ID',
+        scope: 'https://www.googleapis.com/auth/spreadsheets',
+        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
+    }).then(function() {
+        console.log("GAPI client initialized.");
+        // Agora você pode chamar a função de autenticação
+        return gapi.auth2.getAuthInstance().signIn();
+    }).then(function() {
+        console.log("Usuário autenticado.");
+    }).catch(function(error) {
+        console.error("Erro durante a autenticação:", error);
+    });
 });
 
 // Função para carregar os dados da planilha
