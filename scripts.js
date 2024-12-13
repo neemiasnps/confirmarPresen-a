@@ -171,6 +171,7 @@ function limparFormulario() {
 document.addEventListener("DOMContentLoaded", () => {
     initializeGapiClient();
     initializeTokenClient();
+    limparFormulario();
 
     // Inicializar selects do Materialize
     M.FormSelect.init(document.querySelectorAll("select"));
