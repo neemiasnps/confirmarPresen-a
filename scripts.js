@@ -18,6 +18,7 @@ function initializeGapiClient() {
             .then(() => {
                 gapiInitialized = true;
                 console.log("GAPI Client inicializado com sucesso.");
+                initializeTokenClient(); // Chama a inicialização do token client após o GAPI estar carregado
             })
             .catch((error) => {
                 console.error("Erro ao inicializar o GAPI Client:", error);
@@ -26,7 +27,7 @@ function initializeGapiClient() {
     });
 }
 
-// Configura o cliente GIS
+// Função para inicializar o cliente Token Client
 function initializeTokenClient() {
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
