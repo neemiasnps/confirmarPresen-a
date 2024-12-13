@@ -92,11 +92,11 @@ function authenticateAndSend(formData) {
 function loadSheetData() {
     const lojasRange = "Lojas!B2:B";
     const fornecedoresRange = "Fornecedores!A2:A";
-    const urlBase = https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/;
+    const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
 
     Promise.all([
-        fetch(${urlBase}${lojasRange}?key=${API_KEY}).then((res) => res.json()),
-        fetch(${urlBase}${fornecedoresRange}?key=${API_KEY}).then((res) => res.json()),
+        fetch(`${urlBase}${lojasRange}?key=${API_KEY}`).then((res) => res.json()),
+        fetch(`${urlBase}${fornecedoresRange}?key=${API_KEY}`).then((res) => res.json()),
     ])
         .then(([lojasResponse, fornecedoresResponse]) => {
             preencherSelect(lojasResponse.values || [], "loja");
@@ -124,7 +124,7 @@ function preencherSelect(valores, selectId) {
 // Função para carregar nomes de colaboradores com base na loja selecionada
 function loadNomes(lojaSelecionada) {
     const range = "Colaboradores!A2:C";
-    const url = https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY};
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
 
     fetch(url)
         .then((res) => res.json())
@@ -138,7 +138,6 @@ function loadNomes(lojaSelecionada) {
         });
 }
 
-//Função enviar dados
 // Função para enviar dados para a planilha
 function enviarDados(formData) {
     const range = "Confirmação!A2:D";
