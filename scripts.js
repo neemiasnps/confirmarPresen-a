@@ -112,20 +112,10 @@ function loadNomes(lojaSelecionada) {
         });
 }
 
-// Função para obter o e-mail do usuário autenticado
-function getAuthenticatedEmail() {
-    const tokenInfo = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse();
-    const idToken = tokenInfo.id_token;
-    const payload = JSON.parse(atob(idToken.split(".")[1]));
-    return payload.email;
-}
-
 // Função para enviar dados para a planilha
 function enviarDados(formData) {
-    const range = "Confirmação!A2:E"; // Ajustado para incluir coluna de e-mail
-    //const email = getAuthenticatedEmail(); // Obtém o e-mail do usuário autenticado
-    const dataAtual = new Date().toLocaleDateString("pt-BR"); // Data atual no formato DD/MM/AAAA
-    const dados = [[formData.loja, formData.nome, formData.fornecedor, dataAtual]];
+    const range = "Confirmação!A2:D";
+    const dados = [[formData.loja, formData.nome, formData.fornecedor, formData.data]];
 
     gapi.client.sheets.spreadsheets.values
         .append({
@@ -144,27 +134,6 @@ function enviarDados(formData) {
             alert("Ocorreu um erro ao enviar os dados.");
         });
 }
-
-// Configuração do envio do formulário
-document.getElementById("formulario").addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    if (!gapiInitialized) {
-        alert("Erro: O GAPI Client não foi inicializado corretamente.");
-        return;
-    }
-
-    const loja = document.getElementById("loja").value;
-    const nome = document.getElementById("nome").value;
-    const fornecedor = document.getElementById("fornecedor").value;
-
-    if (loja && nome && fornecedor) {
-        authenticateAndSend({ loja, nome, fornecedor }); // A data e o e-mail serão adicionados automaticamente
-    } else {
-        alert("Por favor, preencha todos os campos.");
-    }
-});
-
 
 // Evento para carregar nomes ao selecionar uma loja
 document.getElementById("loja").addEventListener("change", (event) => {
