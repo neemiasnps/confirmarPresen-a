@@ -169,22 +169,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Configurar envio do formulário
     document.getElementById("formulario").addEventListener("submit", (event) => {
-        event.preventDefault();
+    event.preventDefault();
 
-        if (!gapiInitialized) {
+    if (!gapiInitialized) {
         alert("Erro: O GAPI Client não foi inicializado corretamente.");
         return;
     }
 
-        const loja = document.getElementById("loja").value;
-        const nome = document.getElementById("nome").value;
-        const fornecedor = document.getElementById("fornecedor").value;
-        const data = document.getElementById("data").value;
+    const loja = document.getElementById("loja").value;
+    const nome = document.getElementById("nome").value;
+    const fornecedor = document.getElementById("fornecedor").value;
+    const data = document.getElementById("data").value;
 
-        if (loja && nome && fornecedor && data) {
+    if (loja && nome && fornecedor && data) {
+        // Mensagem de confirmação
+        const mensagem = `Confirme as informações:\n\n` +
+            `Loja: ${loja}\n` +
+            `Nome: ${nome}\n` +
+            `Fornecedor: ${fornecedor}\n` +
+            `Data: ${data}\n\n` +
+            `Deseja enviar os dados?`;
+
+        if (confirm(mensagem)) {
+            // Usuário confirmou, prosseguir com o envio
             authenticateAndSend({ loja, nome, fornecedor, data });
         } else {
-            alert("Por favor, preencha todos os campos.");
+            alert("Envio cancelado.");
         }
-    });
+    } else {
+        alert("Por favor, preencha todos os campos.");
+    }
 });
