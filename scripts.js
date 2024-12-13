@@ -131,6 +131,21 @@ document.getElementById("loja").addEventListener("change", (event) => {
 
 // Inicialização da aplicação
 document.addEventListener("DOMContentLoaded", () => {
+
+    // Inicializar selects e datepickers
+  const selects = document.querySelectorAll('select');
+  M.FormSelect.init(selects);
+
+  const datepickers = document.querySelectorAll('.datepicker');
+  M.Datepicker.init(datepickers, {
+    format: 'dd/mm/yyyy',
+    i18n: {
+      months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+      weekdays: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+      weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+    }
+  });
+    
     initializeGapiClient();
     initializeTokenClient();
     loadSheetData();
