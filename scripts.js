@@ -3,7 +3,7 @@ const API_KEY = "AIzaSyBH6EnOSZlpbyHasVJ4qGO_JRmW9iPwp-A";
 const CLIENT_ID = "111240662640-4qiildanoi5dp786qaq9dg9s6in3i61u.apps.googleusercontent.com";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
-// Inicializa o cliente GAPI e autentica o usuário
+// Inicializa o cliente GAPI para autenticação
 function initAndAuthenticate() {
   return new Promise((resolve, reject) => {
     gapi.load("client:auth2", () => {
@@ -19,32 +19,33 @@ function initAndAuthenticate() {
         console.log("Usuário autenticado.");
         resolve();
       }).catch(error => {
-        console.error("Erro durante inicialização/autenticação:", error);
+        console.error("Erro durante autenticação:", error);
+        alert(`Erro de autenticação: ${error.details}`);
         reject(error);
       });
     });
   });
 }
 
-// Função para carregar os dados da planilha
+// Função para carregar os dados da planilha sem autenticação
 function loadSheetData() {
   const lojasRange = "Lojas!B2:B";
   const fornecedoresRange = "Fornecedores!A2:A";
 
+  const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
+  
   Promise.all([
-    gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: lojasRange }),
-    gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: fornecedoresRange })
+    fetch(`${urlBase}${lojasRange}?key=${API_KEY}`).then(res => res.json()),
+    fetch(`${urlBase}${fornecedoresRange}?key=${API_KEY}`).then(res => res.json())
   ]).then(([lojasResponse, fornecedoresResponse]) => {
-    preencherSelect(lojasResponse.result.values || [], 'loja');
-    preencherSelect(fornecedoresResponse.result.values || [], 'fornecedor');
+    preencherSelect(lojasResponse.values || [], 'loja');
+    preencherSelect(fornecedoresResponse.values || [], 'fornecedor');
   }).catch(error => {
     console.error("Erro ao carregar dados da planilha:", error);
   });
 }
 
 // Função genérica para preencher um select
-definir ao final o select
-definir variaveis diretamente
 function preencherSelect(valores, selectId) {
   const selectElement = document.getElementById(selectId);
   selectElement.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
@@ -61,11 +62,10 @@ function preencherSelect(valores, selectId) {
 // Função para carregar os colaboradores de acordo com a loja
 function loadNomes(lojaSelecionada) {
   const range = "Colaboradores!A2:C";
-  gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: range
-  }).then(response => {
-    const colaboradores = response.result.values || [];
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
+
+  fetch(url).then(res => res.json()).then(response => {
+    const colaboradores = response.values || [];
     const nomesFiltrados = colaboradores.filter(colaborador => colaborador[0] === lojaSelecionada);
     preencherSelect(nomesFiltrados.map(colaborador => [colaborador[2]]), 'nome');
   }).catch(error => {
@@ -132,9 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  console.log("Carregando GAPI...");
-  gapi.load("client", () => initAndAuthenticate().then(() => {
-    console.log("Dados da planilha serão carregados.");
-    loadSheetData();
-  }));
+  console.log("Carregando dados da planilha sem autenticação...");
+  loadSheetData();
 });
