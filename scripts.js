@@ -116,6 +116,12 @@ function enviarDados(formData) {
         .then((response) => {
             console.log("Dados enviados com sucesso:", response);
             alert("Dados enviados com sucesso!");
+
+            // Limpar os campos do formulário após o envio
+            document.getElementById("loja").value = "";
+            document.getElementById("nome").value = "";
+            document.getElementById("fornecedor").value = "";
+            document.getElementById("data").value = "";  // Limpar o campo de data
         })
         .catch((error) => {
             console.error("Erro ao enviar dados:", error);
@@ -167,8 +173,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Inicializar clientes do Google API
-    //initializeGapiClient();
-    //initializeTokenClient();
+    initializeGapiClient();
+    initializeTokenClient();
 
     // Carregar dados da planilha
     loadSheetData();
