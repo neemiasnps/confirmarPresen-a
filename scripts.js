@@ -174,9 +174,9 @@ document.addEventListener("DOMContentLoaded", () => {
         event.preventDefault();
 
         if (!gapiInitialized) {
-        alert("Erro: O GAPI Client não foi inicializado corretamente.");
-        return;
-    }
+            alert("Erro: O GAPI Client não foi inicializado corretamente.");
+            return;
+        }
 
         const loja = document.getElementById("loja").value;
         const nome = document.getElementById("nome").value;
