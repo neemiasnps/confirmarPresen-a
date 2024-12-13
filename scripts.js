@@ -3,17 +3,24 @@ const API_KEY = "AIzaSyBH6EnOSZlpbyHasVJ4qGO_JRmW9iPwp-A";
 const CLIENT_ID = "111240662640-4qiildanoi5dp786qaq9dg9s6in3i61u.apps.googleusercontent.com";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
+let gapiInitialized = false;
+let tokenClient;
+
 // Inicializa o cliente GAPI para autenticação
 function initializeGapiClient() {
     gapi.load("client", () => {
-        gapi.client.init({
-            apiKey: API_KEY,
-            discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
-        }).then(() => {
-            gapiInitialized = true;
-        }).catch(error => {
-            console.error("Erro ao inicializar o GAPI Client:", error);
-        });
+        gapi.client
+            .init({
+                apiKey: API_KEY,
+                discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+            })
+            .then(() => {
+                gapiInitialized = true;
+                console.log("GAPI Client inicializado.");
+            })
+            .catch((error) => {
+                console.error("Erro ao inicializar o GAPI Client:", error);
+            });
     });
 }
 
@@ -22,7 +29,7 @@ function initializeTokenClient() {
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
-        callback: "", // Callback configurado no envio do formulário
+        callback: "", // Callback configurado dinamicamente
     });
 }
 
@@ -36,93 +43,100 @@ function authenticateAndSend(formData) {
     tokenClient.callback = (response) => {
         if (response.error) {
             console.error("Erro durante a autenticação:", response);
+            alert("Erro na autenticação. Verifique as configurações.");
             return;
         }
-        // Enviar os dados após autenticação
         enviarDados(formData);
     };
 
     tokenClient.requestAccessToken();
 }
 
-// Função para carregar os dados da planilha sem autenticação
+// Função para carregar dados da planilha
 function loadSheetData() {
-  const lojasRange = "Lojas!B2:B";
-  const fornecedoresRange = "Fornecedores!A2:A";
+    const lojasRange = "Lojas!B2:B";
+    const fornecedoresRange = "Fornecedores!A2:A";
+    const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
 
-  const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
-  
-  Promise.all([
-    fetch(`${urlBase}${lojasRange}?key=${API_KEY}`).then(res => res.json()),
-    fetch(`${urlBase}${fornecedoresRange}?key=${API_KEY}`).then(res => res.json())
-  ]).then(([lojasResponse, fornecedoresResponse]) => {
-    preencherSelect(lojasResponse.values || [], 'loja');
-    preencherSelect(fornecedoresResponse.values || [], 'fornecedor');
-  }).catch(error => {
-    console.error("Erro ao carregar dados da planilha:", error);
-  });
+    Promise.all([
+        fetch(`${urlBase}${lojasRange}?key=${API_KEY}`).then((res) => res.json()),
+        fetch(`${urlBase}${fornecedoresRange}?key=${API_KEY}`).then((res) => res.json()),
+    ])
+        .then(([lojasResponse, fornecedoresResponse]) => {
+            preencherSelect(lojasResponse.values || [], "loja");
+            preencherSelect(fornecedoresResponse.values || [], "fornecedor");
+        })
+        .catch((error) => {
+            console.error("Erro ao carregar dados da planilha:", error);
+        });
 }
 
 // Função genérica para preencher um select
 function preencherSelect(valores, selectId) {
-  const selectElement = document.getElementById(selectId);
-  selectElement.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
-  valores.forEach(valor => {
-    const option = document.createElement('option');
-    option.value = valor[0];
-    option.innerText = valor[0];
-    selectElement.appendChild(option);
-  });
-  // Reinitialize Materialize select
-  M.FormSelect.init(selectElement);
+    const selectElement = document.getElementById(selectId);
+    selectElement.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
+    valores.forEach((valor) => {
+        const option = document.createElement("option");
+        option.value = valor[0];
+        option.innerText = valor[0];
+        selectElement.appendChild(option);
+    });
+    M.FormSelect.init(selectElement);
 }
 
-// Função para carregar os colaboradores de acordo com a loja
+// Função para carregar nomes de colaboradores com base na loja selecionada
 function loadNomes(lojaSelecionada) {
-  const range = "Colaboradores!A2:C";
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
+    const range = "Colaboradores!A2:C";
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
 
-  fetch(url).then(res => res.json()).then(response => {
-    const colaboradores = response.values || [];
-    const nomesFiltrados = colaboradores.filter(colaborador => colaborador[0] === lojaSelecionada);
-    preencherSelect(nomesFiltrados.map(colaborador => [colaborador[2]]), 'nome');
-  }).catch(error => {
-    console.error("Erro ao carregar colaboradores:", error);
-  });
+    fetch(url)
+        .then((res) => res.json())
+        .then((response) => {
+            const colaboradores = response.values || [];
+            const nomesFiltrados = colaboradores.filter((colaborador) => colaborador[0] === lojaSelecionada);
+            preencherSelect(nomesFiltrados.map((colaborador) => [colaborador[2]]), "nome");
+        })
+        .catch((error) => {
+            console.error("Erro ao carregar colaboradores:", error);
+        });
 }
 
-// Evento para atualizar a lista de nomes quando a loja for selecionada
-document.getElementById('loja').addEventListener('change', (event) => {
-  const lojaSelecionada = event.target.value;
-  loadNomes(lojaSelecionada);
-});
-
-// Enviar os dados do formulário
+// Função para enviar dados para a planilha
 function enviarDados(formData) {
     const range = "Confirmação!A2:D";
     const dados = [[formData.loja, formData.nome, formData.fornecedor, formData.data]];
 
-    gapi.client.sheets.spreadsheets.values.append({
-        spreadsheetId: SHEET_ID,
-        range: range,
-        valueInputOption: "RAW",
-        resource: { values: dados },
-    }).then(response => {
-        console.log("Dados enviados com sucesso:", response);
-        alert("Dados enviados com sucesso!");
-    }).catch(error => {
-        console.error("Erro ao enviar dados:", error);
-        alert("Ocorreu um erro ao enviar os dados.");
-    });
+    gapi.client.sheets.spreadsheets.values
+        .append({
+            spreadsheetId: SHEET_ID,
+            range: range,
+            valueInputOption: "RAW",
+            resource: { values: dados },
+        })
+        .then((response) => {
+            console.log("Dados enviados com sucesso:", response);
+            alert("Dados enviados com sucesso!");
+        })
+        .catch((error) => {
+            console.error("Erro ao enviar dados:", error);
+            alert("Ocorreu um erro ao enviar os dados.");
+        });
 }
 
-// Inicialização
+// Evento para carregar nomes ao selecionar uma loja
+document.getElementById("loja").addEventListener("change", (event) => {
+    const lojaSelecionada = event.target.value;
+    loadNomes(lojaSelecionada);
+});
+
+// Inicialização da aplicação
 document.addEventListener("DOMContentLoaded", () => {
     initializeGapiClient();
     initializeTokenClient();
+    loadSheetData();
 
     // Configurar envio do formulário
-    document.getElementById("formulario").addEventListener("submit", function(event) {
+    document.getElementById("formulario").addEventListener("submit", function (event) {
         event.preventDefault();
 
         const loja = document.getElementById("loja").value;
