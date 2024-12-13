@@ -38,7 +38,8 @@ function preencherSelect(valores, selectId) {
     selectElement.appendChild(option);
   });
 
-  M.FormSelect.init(selectElement);  // Inicializa o select usando Materialize
+ // Inicializar o select usando Materialize
+  M.FormSelect.init(selectElement);
 }
 
 // Função para carregar os colaboradores de acordo com a loja
