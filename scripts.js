@@ -134,6 +134,12 @@ function enviarDados(formData) {
         });
 }
 
+// Evento para carregar nomes ao selecionar uma loja
+document.getElementById("loja").addEventListener("change", (event) => {
+    const lojaSelecionada = event.target.value;
+    loadNomes(lojaSelecionada);
+});
+
 // Função para limpar o formulário
 function limparFormulario() {
     document.getElementById("loja").value = "";
