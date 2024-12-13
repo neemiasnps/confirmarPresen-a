@@ -81,25 +81,22 @@ function loadSheetData() {
         });
 }
 
-// Função para carregar os colaboradores de acordo com a loja
+// Função para carregar nomes de colaboradores com base na loja selecionada
 function loadNomes(lojaSelecionada) {
-  const range = "Colaboradores!A2:C";
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
+    const range = "Colaboradores!A2:C";
+    const url = https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY};
 
-  fetch(url).then(res => res.json()).then(response => {
-    const colaboradores = response.values || [];
-    const nomesFiltrados = colaboradores.filter(colaborador => colaborador[0] === lojaSelecionada);
-    preencherSelect(nomesFiltrados.map(colaborador => [colaborador[2]]), 'nome');
-  }).catch(error => {
-    console.error("Erro ao carregar colaboradores:", error);
-  });
+    fetch(url)
+        .then((res) => res.json())
+        .then((response) => {
+            const colaboradores = response.values || [];
+            const nomesFiltrados = colaboradores.filter((colaborador) => colaborador[0] === lojaSelecionada);
+            preencherSelect(nomesFiltrados.map((colaborador) => [colaborador[2]]), "nome");
+        })
+        .catch((error) => {
+            console.error("Erro ao carregar colaboradores:", error);
+        });
 }
-
-// Evento para atualizar a lista de nomes quando a loja for selecionada
-document.getElementById('loja').addEventListener('change', (event) => {
-  const lojaSelecionada = event.target.value;
-  loadNomes(lojaSelecionada);
-});
 
 // Função genérica para preencher um select
 function preencherSelect(valores, selectId) {
