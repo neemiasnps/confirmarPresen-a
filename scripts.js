@@ -158,8 +158,8 @@ document.getElementById("loja").addEventListener("change", (event) => {
 // Inicialização da aplicação
 document.addEventListener("DOMContentLoaded", () => {
     // Inicializar o cliente GAPI e token client
-    initializeGapiClient();
-    initializeTokenClient();
+    //initializeGapiClient();
+    //initializeTokenClient();
 
     // Inicializar selects do Materialize
     const selects = document.querySelectorAll('select');
