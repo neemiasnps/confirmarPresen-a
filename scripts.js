@@ -173,8 +173,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Inicializar clientes do Google API
-    initializeGapiClient();
-    initializeTokenClient();
+    //initializeGapiClient();
+    //initializeTokenClient();
 
     // Carregar dados da planilha
     loadSheetData();
