@@ -3,25 +3,20 @@ const API_KEY = "AIzaSyBH6EnOSZlpbyHasVJ4qGO_JRmW9iPwp-A";
 const CLIENT_ID = "111240662640-4qiildanoi5dp786qaq9dg9s6in3i61u.apps.googleusercontent.com";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
-// Inicializa o cliente GAPI e autentica o usuário
-function initAndAuthenticate() {
-  return new Promise((resolve, reject) => {
-    gapi.load('client:auth2', function() {
-    gapi.client.init({
-        apiKey: 'YOUR_API_KEY',
-        clientId: 'YOUR_CLIENT_ID',
-        scope: 'https://www.googleapis.com/auth/spreadsheets',
-        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
-    }).then(function() {
-        console.log("GAPI client initialized.");
-        // Agora você pode chamar a função de autenticação
-        return gapi.auth2.getAuthInstance().signIn();
-    }).then(function() {
-        console.log("Usuário autenticado.");
-    }).catch(function(error) {
-        console.error("Erro durante a autenticação:", error);
+// Inicializa o cliente GAPI
+function initGapiClient() {
+  return gapi.load('client', function() {
+    return gapi.client.init({
+      apiKey: API_KEY,
+      discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
     });
-});
+  });
+}
+
+// Função para autenticar o usuário
+function authenticate() {
+  return gapi.auth2.getAuthInstance().signIn();
+}
 
 // Função para carregar os dados da planilha
 function loadSheetData() {
@@ -103,7 +98,7 @@ document.getElementById("formulario").addEventListener("submit", function(event)
 
   if (loja && nome && fornecedor && data) {
     const formData = { loja, nome, fornecedor, data };
-    initAndAuthenticate().then(() => enviarDados(formData)).catch(error => {
+    authenticate().then(() => enviarDados(formData)).catch(error => {
       console.error("Erro durante a autenticação:", error);
     });
   } else {
@@ -123,10 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Carregar o GAPI client e autenticar
-  gapi.load("client", () => {
-    initAndAuthenticate().then(loadSheetData).catch(error => {
-      console.error("Erro na inicialização do GAPI:", error);
-    });
+  initGapiClient().then(loadSheetData).catch(error => {
+    console.error("Erro ao inicializar o cliente GAPI:", error);
   });
 });
