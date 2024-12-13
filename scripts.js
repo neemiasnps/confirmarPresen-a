@@ -92,11 +92,11 @@ function authenticateAndSend(formData) {
 function loadSheetData() {
     const lojasRange = "Lojas!B2:B";
     const fornecedoresRange = "Fornecedores!A2:A";
-    const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
+    const urlBase = https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/;
 
     Promise.all([
-        fetch(`${urlBase}${lojasRange}?key=${API_KEY}`).then((res) => res.json()),
-        fetch(`${urlBase}${fornecedoresRange}?key=${API_KEY}`).then((res) => res.json()),
+        fetch(${urlBase}${lojasRange}?key=${API_KEY}).then((res) => res.json()),
+        fetch(${urlBase}${fornecedoresRange}?key=${API_KEY}).then((res) => res.json()),
     ])
         .then(([lojasResponse, fornecedoresResponse]) => {
             preencherSelect(lojasResponse.values || [], "loja");
@@ -124,7 +124,7 @@ function preencherSelect(valores, selectId) {
 // Função para carregar nomes de colaboradores com base na loja selecionada
 function loadNomes(lojaSelecionada) {
     const range = "Colaboradores!A2:C";
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
+    const url = https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY};
 
     fetch(url)
         .then((res) => res.json())
@@ -138,27 +138,49 @@ function loadNomes(lojaSelecionada) {
         });
 }
 
-// Função para enviar dados para a planilha
+//Função enviar dados
 function enviarDados(formData) {
-    const range = "Confirmação!A2:D";
-    const dados = [[formData.loja, formData.nome, formData.fornecedor, formData.data]];
+    // Verifique se o gapi está carregado e autenticado
+    if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
+        // Obtendo o e-mail autenticado
+        const emailAutenticado = gapi.auth2.getAuthInstance().currentUser.get().getEmail();
+        
+        // Obtendo a data atual
+        const dataAtual = new Date().toLocaleString(); // Você pode ajustar o formato da data conforme necessário
+        
+        // Ajustando o intervalo de dados para incluir as colunas E e F
+        const range = "Confirmação!A2:F"; // Ajuste o intervalo para incluir as novas colunas
 
-    gapi.client.sheets.spreadsheets.values
-        .append({
-            spreadsheetId: SHEET_ID,
-            range: range,
-            valueInputOption: "RAW",
-            resource: { values: dados },
-        })
-        .then((response) => {
-            console.log("Dados enviados com sucesso:", response);
-            alert("Dados enviados com sucesso!");
-            limparFormulario();
-        })
-        .catch((error) => {
-            console.error("Erro ao enviar dados:", error);
-            alert("Ocorreu um erro ao enviar os dados.");
-        });
+        // Agora, incluímos o e-mail e a data atual nos dados a serem enviados
+        const dados = [[
+            formData.loja,
+            formData.nome,
+            formData.fornecedor,
+            formData.data,
+            emailAutenticado,  // Adicionando o e-mail na coluna E
+            dataAtual          // Adicionando a data na coluna F
+        ]];
+
+        // Enviar dados para a planilha
+        gapi.client.sheets.spreadsheets.values
+            .append({
+                spreadsheetId: SHEET_ID,
+                range: range,
+                valueInputOption: "RAW",
+                resource: { values: dados },
+            })
+            .then((response) => {
+                console.log("Dados enviados com sucesso:", response);
+                alert("Dados enviados com sucesso!");
+                limparFormulario();
+            })
+            .catch((error) => {
+                console.error("Erro ao enviar dados:", error);
+                alert("Ocorreu um erro ao enviar os dados.");
+            });
+    } else {
+        alert("Usuário não autenticado. Por favor, faça o login.");
+    }
 }
 
 // Evento para carregar nomes ao selecionar uma loja
