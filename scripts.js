@@ -81,6 +81,19 @@ function loadSheetData() {
         });
 }
 
+// Função genérica para preencher um select
+function preencherSelect(valores, selectId) {
+    const selectElement = document.getElementById(selectId);
+    selectElement.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
+    valores.forEach((valor) => {
+        const option = document.createElement("option");
+        option.value = valor[0];
+        option.innerText = valor[0];
+        selectElement.appendChild(option);
+    });
+    M.FormSelect.init(selectElement);
+}
+
 // Função para carregar nomes de colaboradores com base na loja selecionada
 function loadNomes(lojaSelecionada) {
     const range = "Colaboradores!A2:C";
@@ -96,19 +109,6 @@ function loadNomes(lojaSelecionada) {
         .catch((error) => {
             console.error("Erro ao carregar colaboradores:", error);
         });
-}
-
-// Função genérica para preencher um select
-function preencherSelect(valores, selectId) {
-    const selectElement = document.getElementById(selectId);
-    selectElement.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
-    valores.forEach((valor) => {
-        const option = document.createElement("option");
-        option.value = valor[0];
-        option.innerText = valor[0];
-        selectElement.appendChild(option);
-    });
-    M.FormSelect.init(selectElement);
 }
 
 // Função para enviar dados para a planilha
