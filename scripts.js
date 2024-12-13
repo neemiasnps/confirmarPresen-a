@@ -4,27 +4,45 @@ const CLIENT_ID = "111240662640-4qiildanoi5dp786qaq9dg9s6in3i61u.apps.googleuser
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
 // Inicializa o cliente GAPI para autenticação
-function initAndAuthenticate() {
-  return new Promise((resolve, reject) => {
-    gapi.load("client:auth2", () => {
-      gapi.client.init({
-        apiKey: API_KEY,
-        clientId: CLIENT_ID,
-        scope: SCOPES,
-        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
-      }).then(() => {
-        console.log("GAPI client initialized.");
-        return gapi.auth2.getAuthInstance().signIn();
-      }).then(() => {
-        console.log("Usuário autenticado.");
-        resolve();
-      }).catch(error => {
-        console.error("Erro durante autenticação:", error);
-        alert(`Erro de autenticação: ${error.details}`);
-        reject(error);
-      });
+function initializeGapiClient() {
+    gapi.load("client", () => {
+        gapi.client.init({
+            apiKey: API_KEY,
+            discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+        }).then(() => {
+            gapiInitialized = true;
+        }).catch(error => {
+            console.error("Erro ao inicializar o GAPI Client:", error);
+        });
     });
-  });
+}
+
+// Configura o cliente GIS
+function initializeTokenClient() {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: "", // Callback configurado no envio do formulário
+    });
+}
+
+// Autenticar e enviar dados
+function authenticateAndSend(formData) {
+    if (!gapiInitialized) {
+        alert("Erro: O GAPI Client não foi inicializado.");
+        return;
+    }
+
+    tokenClient.callback = (response) => {
+        if (response.error) {
+            console.error("Erro durante a autenticação:", response);
+            return;
+        }
+        // Enviar os dados após autenticação
+        enviarDados(formData);
+    };
+
+    tokenClient.requestAccessToken();
 }
 
 // Função para carregar os dados da planilha sem autenticação
@@ -79,59 +97,44 @@ document.getElementById('loja').addEventListener('change', (event) => {
   loadNomes(lojaSelecionada);
 });
 
-// Função para enviar os dados do formulário
+// Enviar os dados do formulário
 function enviarDados(formData) {
-  const range = "Confirmação!A2:D";
-  const dados = [[formData.loja, formData.nome, formData.fornecedor, formData.data]];
+    const range = "Confirmação!A2:D";
+    const dados = [[formData.loja, formData.nome, formData.fornecedor, formData.data]];
 
-  gapi.client.sheets.spreadsheets.values.append({
-    spreadsheetId: SHEET_ID,
-    range: range,
-    valueInputOption: "RAW",
-    resource: { values: dados }
-  }).then(response => {
-    console.log('Dados enviados com sucesso:', response);
-    alert("Dados enviados com sucesso!");
-  }).catch(error => {
-    console.error("Erro ao enviar dados:", error);
-    alert("Ocorreu um erro ao enviar os dados.");
-  });
+    gapi.client.sheets.spreadsheets.values.append({
+        spreadsheetId: SHEET_ID,
+        range: range,
+        valueInputOption: "RAW",
+        resource: { values: dados },
+    }).then(response => {
+        console.log("Dados enviados com sucesso:", response);
+        alert("Dados enviados com sucesso!");
+    }).catch(error => {
+        console.error("Erro ao enviar dados:", error);
+        alert("Ocorreu um erro ao enviar os dados.");
+    });
 }
 
-// Capturar e enviar os dados do formulário
-document.getElementById("formulario").addEventListener("submit", function(event) {
-  event.preventDefault();
-  const loja = document.getElementById("loja").value;
-  const nome = document.getElementById("nome").value;
-  const fornecedor = document.getElementById("fornecedor").value;
-  const data = document.getElementById("data").value;
+// Inicialização
+document.addEventListener("DOMContentLoaded", () => {
+    initializeGapiClient();
+    initializeTokenClient();
 
-  if (loja && nome && fornecedor && data) {
-    const formData = { loja, nome, fornecedor, data };
-    initAndAuthenticate().then(() => enviarDados(formData));
-  } else {
-    alert("Por favor, preencha todos os campos.");
-  }
-});
+    // Configurar envio do formulário
+    document.getElementById("formulario").addEventListener("submit", function(event) {
+        event.preventDefault();
 
-// Inicializar Materialize e carregar os dados da planilha
-document.addEventListener('DOMContentLoaded', function() {
-  console.log("Inicializando Materialize...");
+        const loja = document.getElementById("loja").value;
+        const nome = document.getElementById("nome").value;
+        const fornecedor = document.getElementById("fornecedor").value;
+        const data = document.getElementById("data").value;
 
-  // Inicializar selects e datepickers
-  const selects = document.querySelectorAll('select');
-  M.FormSelect.init(selects);
-
-  const datepickers = document.querySelectorAll('.datepicker');
-  M.Datepicker.init(datepickers, {
-    format: 'dd/mm/yyyy',
-    i18n: {
-      months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-      weekdays: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
-      weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
-    }
-  });
-
-  console.log("Carregando dados da planilha sem autenticação...");
-  loadSheetData();
+        if (loja && nome && fornecedor && data) {
+            const formData = { loja, nome, fornecedor, data };
+            authenticateAndSend(formData);
+        } else {
+            alert("Por favor, preencha todos os campos.");
+        }
+    });
 });
