@@ -114,8 +114,9 @@ function loadNomes(lojaSelecionada) {
 
 // Função para enviar dados para a planilha
 function enviarDados(formData) {
-    const range = "Confirmação!A2:D";
-    const dados = [[formData.loja, formData.nome, formData.fornecedor, formData.data]];
+    const range = "Confirmação!A2:E";
+    const dataAtual = new Date().toLocaleDateString("pt-BR"); // Data atual no formato DD/MM/AAAA
+    const dados = [[formData.loja, formData.nome, formData.fornecedor, formData.data, dataAtual]];
 
     gapi.client.sheets.spreadsheets.values
         .append({
