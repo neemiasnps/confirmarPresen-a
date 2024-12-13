@@ -65,11 +65,11 @@ function authenticateAndSend(formData) {
 function loadSheetData() {
     const lojasRange = "Lojas!B2:B";
     const fornecedoresRange = "Fornecedores!A2:A";
-    const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
+    const urlBase = https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/;
 
     Promise.all([
-        fetch(`${urlBase}${lojasRange}?key=${API_KEY}`).then((res) => res.json()),
-        fetch(`${urlBase}${fornecedoresRange}?key=${API_KEY}`).then((res) => res.json()),
+        fetch(${urlBase}${lojasRange}?key=${API_KEY}).then((res) => res.json()),
+        fetch(${urlBase}${fornecedoresRange}?key=${API_KEY}).then((res) => res.json()),
     ])
         .then(([lojasResponse, fornecedoresResponse]) => {
             preencherSelect(lojasResponse.values || [], "loja");
@@ -97,7 +97,7 @@ function preencherSelect(valores, selectId) {
 // Função para carregar nomes de colaboradores com base na loja selecionada
 function loadNomes(lojaSelecionada) {
     const range = "Colaboradores!A2:C";
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
+    const url = https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY};
 
     fetch(url)
         .then((res) => res.json())
@@ -169,34 +169,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Configurar envio do formulário
     document.getElementById("formulario").addEventListener("submit", (event) => {
-    event.preventDefault();
+        event.preventDefault();
 
-    if (!gapiInitialized) {
+        if (!gapiInitialized) {
         alert("Erro: O GAPI Client não foi inicializado corretamente.");
         return;
     }
 
-    const loja = document.getElementById("loja").value;
-    const nome = document.getElementById("nome").value;
-    const fornecedor = document.getElementById("fornecedor").value;
-    const data = document.getElementById("data").value;
+        const loja = document.getElementById("loja").value;
+        const nome = document.getElementById("nome").value;
+        const fornecedor = document.getElementById("fornecedor").value;
+        const data = document.getElementById("data").value;
 
-    if (loja && nome && fornecedor && data) {
-        // Mensagem de confirmação
-        const mensagem = `Confirme as informações:\n\n` +
-            `Loja: ${loja}\n` +
-            `Nome: ${nome}\n` +
-            `Fornecedor: ${fornecedor}\n` +
-            `Data: ${data}\n\n` +
-            `Deseja enviar os dados?`;
-
-        if (confirm(mensagem)) {
-            // Usuário confirmou, prosseguir com o envio
+        if (loja && nome && fornecedor && data) {
             authenticateAndSend({ loja, nome, fornecedor, data });
         } else {
-            alert("Envio cancelado.");
+            alert("Por favor, preencha todos os campos.");
         }
-    } else {
-        alert("Por favor, preencha todos os campos.");
-    }
+    });
 });
