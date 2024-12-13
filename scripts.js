@@ -6,62 +6,36 @@ const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 let gapiInitialized = false;
 let tokenClient;
 
+// Inicializar o cliente GAPI
 function initializeGapiClient() {
-    console.log("Tentando inicializar o GAPI Client...");
-    
-    // Carregar o script da API do Google se ainda não estiver carregado
-    if (typeof gapi === "undefined") {
-        const script = document.createElement("script");
-        script.src = "https://apis.google.com/js/api.js";
-        script.onload = () => {
-            gapi.load("client", () => {
-                gapi.client
-                    .init({
-                        apiKey: API_KEY,
-                        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
-                    })
-                    .then(() => {
-                        gapiInitialized = true;
-                        console.log("GAPI Client inicializado com sucesso.");
-                        initializeTokenClient(); // Chama a inicialização do token client após o GAPI estar carregado
-                    })
-                    .catch((error) => {
-                        console.error("Erro ao inicializar o GAPI Client:", error);
-                        alert("Erro ao inicializar o GAPI Client.");
-                    });
+    gapi.load("client", () => {
+        gapi.client
+            .init({
+                apiKey: API_KEY,
+                discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+            })
+            .then(() => {
+                gapiInitialized = true;
+                console.log("GAPI Client inicializado com sucesso.");
+            })
+            .catch((error) => {
+                console.error("Erro ao inicializar o GAPI Client:", error);
             });
-        };
-        document.body.appendChild(script);
-    } else {
-        // Caso o GAPI já tenha sido carregado, inicialize imediatamente
-        gapi.load("client", () => {
-            gapi.client
-                .init({
-                    apiKey: API_KEY,
-                    discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
-                })
-                .then(() => {
-                    gapiInitialized = true;
-                    console.log("GAPI Client inicializado com sucesso.");
-                    initializeTokenClient();
-                })
-                .catch((error) => {
-                    console.error("Erro ao inicializar o GAPI Client:", error);
-                    alert("Erro ao inicializar o GAPI Client.");
-                });
-        });
-    }
+    });
 }
 
-// Função para inicializar o cliente Token Client
+// Inicializar o cliente de token OAuth2
 function initializeTokenClient() {
+    if (typeof google === "undefined" || !google.accounts) {
+        console.error("Erro: O script GSI não foi carregado.");
+        return;
+    }
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
         callback: (response) => {
             if (response.error) {
                 console.error("Erro durante a autenticação:", response);
-                alert("Erro na autenticação. Verifique as configurações.");
             } else {
                 console.log("Autenticação bem-sucedida!");
             }
