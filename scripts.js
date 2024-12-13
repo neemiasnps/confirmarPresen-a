@@ -138,10 +138,18 @@ function loadNomes(lojaSelecionada) {
         });
 }
 
-// Função para enviar dados para a planilha
 function enviarDados(formData) {
-    const range = "Confirmação!A2:D";
-    const dados = [[formData.loja, formData.nome, formData.fornecedor, formData.data]];
+    // Obtendo a data atual
+    const dataAtual = new Date().toLocaleString(); // Formato da data pode ser ajustado conforme necessário
+    
+    // Obtendo o e-mail autenticado (presumindo que você já tenha feito a autenticação com o Google)
+    const emailAutenticado = gapi.auth2.getAuthInstance().currentUser.get().getEmail();
+
+    // Ajustando o intervalo de dados para incluir as colunas E e F
+    const range = "Confirmação!A2:F"; // Ajuste o intervalo para incluir as novas colunas
+
+    // Agora, incluímos o e-mail e a data atual nos dados a serem enviados
+    const dados = [[formData.loja, formData.nome, formData.fornecedor, formData.data, emailAutenticado, dataAtual]];
 
     gapi.client.sheets.spreadsheets.values
         .append({
@@ -160,6 +168,7 @@ function enviarDados(formData) {
             alert("Ocorreu um erro ao enviar os dados.");
         });
 }
+
 
 // Evento para carregar nomes ao selecionar uma loja
 document.getElementById("loja").addEventListener("change", (event) => {
