@@ -8,6 +8,7 @@ let tokenClient;
 
 // Função para inicializar o cliente GAPI
 function initializeGapiClient() {
+    console.log("Tentando inicializar o GAPI Client...");
     gapi.load("client", () => {
         gapi.client
             .init({
@@ -16,7 +17,7 @@ function initializeGapiClient() {
             })
             .then(() => {
                 gapiInitialized = true;
-                console.log("GAPI Client inicializado.");
+                console.log("GAPI Client inicializado com sucesso.");
             })
             .catch((error) => {
                 console.error("Erro ao inicializar o GAPI Client:", error);
@@ -145,6 +146,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Configurar envio do formulário
     document.getElementById("formulario").addEventListener("submit", (event) => {
         event.preventDefault();
+
+        if (!gapiInitialized) {
+        alert("Erro: O GAPI Client não foi inicializado corretamente.");
+        return;
+    }
 
         const loja = document.getElementById("loja").value;
         const nome = document.getElementById("nome").value;
