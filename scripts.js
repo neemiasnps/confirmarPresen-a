@@ -123,7 +123,7 @@ function getAuthenticatedEmail() {
 // Função para enviar dados para a planilha
 function enviarDados(formData) {
     const range = "Confirmação!A2:E"; // Ajustado para incluir coluna de e-mail
-    const email = getAuthenticatedEmail(); // Obtém o e-mail do usuário autenticado
+    //const email = getAuthenticatedEmail(); // Obtém o e-mail do usuário autenticado
     const dataAtual = new Date().toLocaleDateString("pt-BR"); // Data atual no formato DD/MM/AAAA
     const dados = [[formData.loja, formData.nome, formData.fornecedor, dataAtual, email]];
 
