@@ -3,7 +3,7 @@ const API_KEY = "AIzaSyBH6EnOSZlpbyHasVJ4qGO_JRmW9iPwp-A";
 const CLIENT_ID = "111240662640-4qiildanoi5dp786qaq9dg9s6in3i61u.apps.googleusercontent.com";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
-// Inicializa o cliente GAPI para autenticação
+// Inicializa o cliente GAPI e autentica o usuário
 function initAndAuthenticate() {
   return new Promise((resolve, reject) => {
     gapi.load("client:auth2", () => {
@@ -19,27 +19,25 @@ function initAndAuthenticate() {
         console.log("Usuário autenticado.");
         resolve();
       }).catch(error => {
-        console.error("Erro durante autenticação:", error);
-        alert(`Erro de autenticação: ${error.details}`);
+        console.error("Erro durante inicialização/autenticação:", error);
         reject(error);
       });
     });
   });
 }
 
-// Função para carregar os dados da planilha sem autenticação
+// Função para carregar os dados da planilha
 function loadSheetData() {
   const lojasRange = "Lojas!B2:B";
   const fornecedoresRange = "Fornecedores!A2:A";
 
-  const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
-  
+  // Carregar as listas de lojas e fornecedores
   Promise.all([
-    fetch(`${urlBase}${lojasRange}?key=${API_KEY}`).then(res => res.json()),
-    fetch(`${urlBase}${fornecedoresRange}?key=${API_KEY}`).then(res => res.json())
+    gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: lojasRange }),
+    gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: fornecedoresRange })
   ]).then(([lojasResponse, fornecedoresResponse]) => {
-    preencherSelect(lojasResponse.values || [], 'loja');
-    preencherSelect(fornecedoresResponse.values || [], 'fornecedor');
+    preencherSelect(lojasResponse.result.values || [], 'loja');
+    preencherSelect(fornecedoresResponse.result.values || [], 'fornecedor');
   }).catch(error => {
     console.error("Erro ao carregar dados da planilha:", error);
   });
@@ -55,17 +53,17 @@ function preencherSelect(valores, selectId) {
     option.innerText = valor[0];
     selectElement.appendChild(option);
   });
-  // Reinitialize Materialize select
   M.FormSelect.init(selectElement);
 }
 
 // Função para carregar os colaboradores de acordo com a loja
 function loadNomes(lojaSelecionada) {
   const range = "Colaboradores!A2:C";
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
-
-  fetch(url).then(res => res.json()).then(response => {
-    const colaboradores = response.values || [];
+  gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: range
+  }).then(response => {
+    const colaboradores = response.result.values || [];
     const nomesFiltrados = colaboradores.filter(colaborador => colaborador[0] === lojaSelecionada);
     preencherSelect(nomesFiltrados.map(colaborador => [colaborador[2]]), 'nome');
   }).catch(error => {
@@ -116,14 +114,8 @@ document.getElementById("formulario").addEventListener("submit", function(event)
 
 // Inicializar Materialize e carregar os dados da planilha
 document.addEventListener('DOMContentLoaded', function() {
-  console.log("Inicializando Materialize...");
-
-  // Inicializar selects e datepickers
-  const selects = document.querySelectorAll('select');
-  M.FormSelect.init(selects);
-
-  const datepickers = document.querySelectorAll('.datepicker');
-  M.Datepicker.init(datepickers, {
+  M.FormSelect.init(document.querySelectorAll('select'));
+  M.Datepicker.init(document.querySelectorAll('.datepicker'), {
     format: 'dd/mm/yyyy',
     i18n: {
       months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
@@ -132,6 +124,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  console.log("Carregando dados da planilha sem autenticação...");
-  loadSheetData();
+  gapi.load("client", () => initAndAuthenticate().then(loadSheetData));
 });
