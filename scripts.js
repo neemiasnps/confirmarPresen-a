@@ -124,5 +124,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  gapi.load("client", () => initAndAuthenticate().then(loadSheetData));
+  gapi.load("client", () => {
+  initAndAuthenticate().then(loadSheetData).catch(error => {
+    console.error("Erro na inicialização do GAPI:", error);
+  });
+});
 });
