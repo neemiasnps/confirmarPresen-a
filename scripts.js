@@ -96,32 +96,19 @@ function preencherSelect(valores, selectId) {
     M.FormSelect.init(selectElement);
 }*/
 
-// Função para capitalizar a primeira letra de cada palavra
-function capitalizeFirstLetterOfEachWord(string) {
-    return string
-        .split(' ')  // Divide a string em palavras
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitaliza a primeira letra de cada palavra
-        .join(' ');  // Junta as palavras novamente com espaços
-}
-
 // Função para preencher a lista suspensa
 function preencherSelect(opcoes, selectId) {
     const select = document.getElementById(selectId);
     if (!select) return console.error(`Select com ID '${selectId}' não encontrado.`);
 
     // Limpa as opções existentes
-    select.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
+    select.innerHTML = '<option value="" disabled selected>Selecione o fornecedor</option>';
 
     // Adiciona novas opções
     opcoes.forEach(([fornecedor]) => {
         const option = document.createElement("option");
-
-        // Formata o nome do fornecedor com a primeira letra maiúscula
-        const fornecedorFormatado = capitalizeFirstLetterOfEachWord(fornecedor);
-
-        option.value = fornecedorFormatado;  // Valor formatado
-        option.textContent = fornecedorFormatado;  // Texto exibido formatado
-
+        option.value = fornecedor;
+        option.textContent = fornecedor;
         select.appendChild(option);
     });
 
