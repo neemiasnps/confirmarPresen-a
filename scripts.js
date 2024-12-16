@@ -102,7 +102,7 @@ function preencherSelect(opcoes, selectId) {
     if (!select) return console.error(`Select com ID '${selectId}' não encontrado.`);
 
     // Limpa as opções existentes
-    select.innerHTML = '<option value="" disabled selected>Selecione o fornecedor</option>';
+    select.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
 
     // Adiciona novas opções
     opcoes.forEach(([fornecedor]) => {
@@ -167,7 +167,7 @@ function loadFornecedoresPorLojaEData(lojaSelecionada) {
                 if (fornecedorData) {
                     // Preencher o campo de data com a data associada ao fornecedor
                     const dataFornecedor = fornecedorData[2]; // Data da coluna C
-                    const campoData = document.getElementById("data"); // ID do campo de data
+                    const campoData = document.getElementById("dataFornecedor"); // ID do campo de data
                     campoData.value = dataFornecedor; // Preencher o campo com a data no formato dd/mm/yyyy
                 }
             });
