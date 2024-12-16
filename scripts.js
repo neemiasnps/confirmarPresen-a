@@ -1,4 +1,5 @@
 const SHEET_ID = "1vs2YWG1NrNAK0WoiJOA_E2RNVqrm3etO3n4wQP0Zuvc";
+const SHEET_ID_FORNECEDORES_2 = "1xg9XLQM6UqmqmHPcURKBXBkfH18DzQwcIPyg5Ei5rns";
 const API_KEY = "AIzaSyBH6EnOSZlpbyHasVJ4qGO_JRmW9iPwp-A";
 const CLIENT_ID = "111240662640-4qiildanoi5dp786qaq9dg9s6in3i61u.apps.googleusercontent.com";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
@@ -112,6 +113,38 @@ function loadNomes(lojaSelecionada) {
         });
 }
 
+// Função para carregar os fornecedores com base na loja e data atual
+function loadFornecedoresPorLojaEData(lojaSelecionada) {
+    const range = "Planilha1!A2:C"; // Colunas A (Loja), B (Fornecedor), C (Data)
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/1xg9XLQM6UqmqmHPcURKBXBkfH18DzQwcIPyg5Ei5rns/values/${range}?key=${API_KEY}`;
+    
+    const dataAtual = new Date();
+
+    fetch(url)
+        .then((res) => res.json())
+        .then((response) => {
+            const registros = response.values || [];
+            const fornecedoresFiltrados = registros.filter((registro) => {
+                const [loja, fornecedor, dataTreinamento] = registro;
+                if (loja !== lojaSelecionada) return false;
+
+                const dataFormatada = new Date(dataTreinamento.split("/").reverse().join("-"));
+                return dataAtual.toDateString() === dataFormatada.toDateString();
+            });
+            
+            // Preencher lista suspensa com os fornecedores filtrados
+            preencherSelect(
+                fornecedoresFiltrados.map((registro) => [registro[1]]), // Apenas fornecedores
+                "fornecedor2" // ID do novo select
+            );
+        })
+        .catch((error) => {
+            console.error("Erro ao carregar fornecedores:", error);
+            alert("Erro ao carregar fornecedores. Tente novamente mais tarde.");
+        });
+}
+
+
 // Função para enviar dados para a planilha
 function enviarDados(formData) {
     const range = "Confirmação!A2:D";
@@ -139,6 +172,7 @@ function enviarDados(formData) {
 document.getElementById("loja").addEventListener("change", (event) => {
     const lojaSelecionada = event.target.value;
     loadNomes(lojaSelecionada);
+    loadFornecedoresPorLojaEData(lojaSelecionada); // Atualizado
 });
 
 // Função para limpar o formulário
