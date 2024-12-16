@@ -133,59 +133,42 @@ function loadNomes(lojaSelecionada) {
         });
 }
 
-// Função para carregar fornecedores com base na loja e data atual
-// Função para carregar fornecedores com base na loja e data atual
+// Função para carregar fornecedores por loja e data
 function loadFornecedoresPorLojaEData(lojaSelecionada) {
     const range = "Página1!A2:C"; // Colunas A (Loja), B (Fornecedor), C (Data)
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID_FORNECEDORES_2}/values/${range}?key=${API_KEY}`;
     
     const dataAtual = new Date();
-    const dataAtualFormatada = dataAtual.toISOString().split('T')[0]; // Formato 'yyyy-mm-dd'
 
     fetch(url)
         .then((res) => res.json())
         .then((response) => {
             const registros = response.values || [];
-            console.log("Registros retornados pela API:", registros);
-
-            // Filtra os fornecedores com base na loja e na data atual
             const fornecedoresFiltrados = registros.filter((registro) => {
                 const [loja, fornecedor, dataTreinamento] = registro;
+                if (loja !== lojaSelecionada) return false;
 
-                // Verifica se a loja corresponde
-                if (loja.trim() !== lojaSelecionada) return false;
-
-                // Converte a data da planilha (dd/mm/yyyy) para o formato 'yyyy-mm-dd'
-                const [dia, mes, ano] = dataTreinamento.split("/"); // Divide a data em dia, mês e ano
-                const dataTreinamentoFormatada = `${ano}-${mes}-${dia}`; // Formato 'yyyy-mm-dd'
-
-                // Compara a data formatada da planilha com a data atual
-                return dataTreinamentoFormatada === dataAtualFormatada;
+                const dataFormatada = new Date(dataTreinamento.split("/").reverse().join("-"));
+                return dataAtual.toDateString() === dataFormatada.toDateString();
             });
-
-            console.log("Fornecedores filtrados:", fornecedoresFiltrados);
-
-            // Preenche a lista suspensa com os fornecedores filtrados
+            
+            // Preencher lista suspensa com os fornecedores filtrados
             preencherSelect(
                 fornecedoresFiltrados.map((registro) => [registro[1]]), // Apenas fornecedores
                 "fornecedor2" // ID do novo select
             );
 
-            // Adiciona o evento para preencher o campo de data quando o fornecedor for selecionado
+            // Adicionar evento para preencher o campo de data ao selecionar um fornecedor
             const selectFornecedor = document.getElementById("fornecedor2");
             selectFornecedor.addEventListener("change", function () {
                 const fornecedorSelecionado = selectFornecedor.value;
+                const fornecedorData = fornecedoresFiltrados.find(registro => registro[1] === fornecedorSelecionado);
 
-                // Encontra o fornecedor selecionado e preenche a data
-                const fornecedorData = fornecedoresFiltrados.find((registro) => registro[1] === fornecedorSelecionado);
                 if (fornecedorData) {
-                    const [loja, fornecedor, dataTreinamento] = fornecedorData;
-                    const [dia, mes, ano] = dataTreinamento.split("/"); // Divide a data em dia, mês e ano
-                    const dataFormatada = `${ano}-${mes}-${dia}`; // Formato 'yyyy-mm-dd'
-
-                    // Preenche o campo de data
-                    const campoData = document.getElementById("data");
-                    campoData.value = dataFormatada; // Preenche com a data no formato 'yyyy-mm-dd'
+                    // Preencher o campo de data com a data associada ao fornecedor
+                    const dataFornecedor = fornecedorData[2]; // Data da coluna C
+                    const campoData = document.getElementById("data"); // ID do campo de data
+                    campoData.value = dataFornecedor; // Preencher o campo com a data no formato dd/mm/yyyy
                 }
             });
         })
