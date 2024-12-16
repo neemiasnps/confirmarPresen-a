@@ -124,6 +124,8 @@ function loadFornecedoresPorLojaEData(lojaSelecionada) {
         .then((res) => res.json())
         .then((response) => {
             const registros = response.values || [];
+            console.log("Registros retornados pela API:", registros);
+
             const fornecedoresFiltrados = registros.filter((registro) => {
                 const [loja, fornecedor, dataTreinamento] = registro;
                 if (loja !== lojaSelecionada) return false;
@@ -131,7 +133,9 @@ function loadFornecedoresPorLojaEData(lojaSelecionada) {
                 const dataFormatada = new Date(dataTreinamento.split("/").reverse().join("-"));
                 return dataAtual.toDateString() === dataFormatada.toDateString();
             });
-            
+
+            console.log("Fornecedores filtrados:", fornecedoresFiltrados);
+
             // Preencher lista suspensa com os fornecedores filtrados
             preencherSelect(
                 fornecedoresFiltrados.map((registro) => [registro[1]]), // Apenas fornecedores
@@ -143,7 +147,6 @@ function loadFornecedoresPorLojaEData(lojaSelecionada) {
             alert("Erro ao carregar fornecedores. Tente novamente mais tarde.");
         });
 }
-
 
 // Função para enviar dados para a planilha
 function enviarDados(formData) {
