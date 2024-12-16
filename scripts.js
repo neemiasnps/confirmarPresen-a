@@ -151,8 +151,14 @@ function loadFornecedoresPorLojaEData(lojaSelecionada) {
             const fornecedoresFiltrados = registros.filter((registro) => {
                 const [loja, fornecedor, dataTreinamento] = registro;
 
+                // Log para verificar os valores de loja e fornecedor
+                console.log("Loja selecionada:", lojaSelecionada);
+                console.log("Loja da planilha:", loja.trim());
+                console.log("Data do treinamento na planilha:", dataTreinamento.trim());
+                console.log("Data atual formatada:", dataAtualFormatada);
+
                 // Verifica se a loja corresponde
-                if (loja !== lojaSelecionada) return false;
+                if (loja.trim() !== lojaSelecionada) return false;
 
                 // Converte a data da planilha (dd/mm/yyyy) para o formato 'yyyy-mm-dd'
                 const [dia, mes, ano] = dataTreinamento.split("/"); // Divide a data em dia, mês e ano
