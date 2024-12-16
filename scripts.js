@@ -133,7 +133,6 @@ function loadNomes(lojaSelecionada) {
         });
 }
 
-// Função para carregar os fornecedores com base na loja e data atual
 // Função para carregar fornecedores com base na loja e data atual
 function loadFornecedoresPorLojaEData(lojaSelecionada) {
     const range = "Página1!A2:C"; // Colunas A (Loja), B (Fornecedor), C (Data)
@@ -155,8 +154,11 @@ function loadFornecedoresPorLojaEData(lojaSelecionada) {
                 // Verifica se a loja corresponde
                 if (loja !== lojaSelecionada) return false;
 
-                // Verifica se a data da planilha corresponde à data atual
-                const dataTreinamentoFormatada = new Date(dataTreinamento.split("/").reverse().join("-")).toISOString().split('T')[0]; // Formato 'yyyy-mm-dd'
+                // Converte a data da planilha (dd/mm/yyyy) para o formato 'yyyy-mm-dd'
+                const [dia, mes, ano] = dataTreinamento.split("/"); // Divide a data em dia, mês e ano
+                const dataTreinamentoFormatada = `${ano}-${mes}-${dia}`; // Formato 'yyyy-mm-dd'
+
+                // Compara a data formatada da planilha com a data atual
                 return dataTreinamentoFormatada === dataAtualFormatada;
             });
 
