@@ -96,6 +96,11 @@ function preencherSelect(valores, selectId) {
     M.FormSelect.init(selectElement);
 }*/
 
+// Função para formatar a string com a primeira letra maiúscula
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
 // Função para preencher a lista suspensa
 function preencherSelect(opcoes, selectId) {
     const select = document.getElementById(selectId);
@@ -108,11 +113,11 @@ function preencherSelect(opcoes, selectId) {
     opcoes.forEach(([fornecedor]) => {
         const option = document.createElement("option");
 
-        // Converte o fornecedor para minúsculas
-        const fornecedorMin = fornecedor.toLowerCase();
+        // Formata o nome do fornecedor com a primeira letra maiúscula
+        const fornecedorFormatado = capitalizeFirstLetter(fornecedor);
 
-        option.value = fornecedorMin;  // Valor em minúsculas
-        option.textContent = fornecedorMin;  // Texto exibido em minúsculas
+        option.value = fornecedorFormatado;  // Valor formatado
+        option.textContent = fornecedorFormatado;  // Texto exibido formatado
 
         select.appendChild(option);
     });
