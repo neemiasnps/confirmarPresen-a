@@ -107,8 +107,13 @@ function preencherSelect(opcoes, selectId) {
     // Adiciona novas opções
     opcoes.forEach(([fornecedor]) => {
         const option = document.createElement("option");
-        option.value = fornecedor;
-        option.textContent = fornecedor;
+
+        // Converte o fornecedor para minúsculas
+        const fornecedorMin = fornecedor.toLowerCase();
+
+        option.value = fornecedorMin;  // Valor em minúsculas
+        option.textContent = fornecedorMin;  // Texto exibido em minúsculas
+
         select.appendChild(option);
     });
 
