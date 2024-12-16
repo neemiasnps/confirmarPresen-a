@@ -115,7 +115,7 @@ function loadNomes(lojaSelecionada) {
 
 // Função para carregar os fornecedores com base na loja e data atual
 function loadFornecedoresPorLojaEData(lojaSelecionada) {
-    const range = "Planilha1!A2:C"; // Colunas A (Loja), B (Fornecedor), C (Data)
+    const range = "Página1!A2:C"; // Colunas A (Loja), B (Fornecedor), C (Data)
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID_FORNECEDORES_2}/values/${range}?key=${API_KEY}`;
     
     const dataAtual = new Date();
