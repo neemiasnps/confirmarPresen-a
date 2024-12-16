@@ -187,7 +187,7 @@ function loadFornecedoresPorLojaEData(lojaSelecionada) {
                     campoData.value = dataFormatada; // Preenche com a data no formato 'yyyy-mm-dd'
                     
                     // Atualiza o select do Materialize
-                    M.FormSelect.init(select);
+                   M.FormSelect.init(document.getElementById("data"));
                 }
             });
         })
