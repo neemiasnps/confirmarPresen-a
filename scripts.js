@@ -183,7 +183,7 @@ function loadFornecedoresPorLojaEData(lojaSelecionada) {
                     const dataFormatada = `${ano}-${mes}-${dia}`; // Formato 'yyyy-mm-dd'
 
                     // Preenche o campo de data
-                    const campoData = document.getElementById("dataFornecedor");
+                    const campoData = document.getElementById("data");
                     campoData.value = dataFormatada; // Preenche com a data no formato 'yyyy-mm-dd'
                 }
             });
