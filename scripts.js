@@ -102,7 +102,7 @@ function preencherSelect(opcoes, selectId) {
     if (!select) return console.error(`Select com ID '${selectId}' não encontrado.`);
 
     // Limpa as opções existentes
-    select.innerHTML = '<option value="" disabled selected>Selecione o fornecedor</option>';
+    select.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
 
     // Adiciona novas opções
     opcoes.forEach(([fornecedor]) => {
