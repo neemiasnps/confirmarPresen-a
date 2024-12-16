@@ -114,11 +114,13 @@ function loadNomes(lojaSelecionada) {
 }
 
 // Função para carregar os fornecedores com base na loja e data atual
+// Função para carregar fornecedores com base na loja e data atual
 function loadFornecedoresPorLojaEData(lojaSelecionada) {
     const range = "Página1!A2:C"; // Colunas A (Loja), B (Fornecedor), C (Data)
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID_FORNECEDORES_2}/values/${range}?key=${API_KEY}`;
     
     const dataAtual = new Date();
+    const dataAtualFormatada = dataAtual.toISOString().split('T')[0]; // Formato 'yyyy-mm-dd'
 
     fetch(url)
         .then((res) => res.json())
@@ -126,17 +128,21 @@ function loadFornecedoresPorLojaEData(lojaSelecionada) {
             const registros = response.values || [];
             console.log("Registros retornados pela API:", registros);
 
+            // Filtra os fornecedores com base na loja e na data atual
             const fornecedoresFiltrados = registros.filter((registro) => {
                 const [loja, fornecedor, dataTreinamento] = registro;
+
+                // Verifica se a loja corresponde
                 if (loja !== lojaSelecionada) return false;
 
-                const dataFormatada = new Date(dataTreinamento.split("/").reverse().join("-"));
-                return dataAtual.toDateString() === dataFormatada.toDateString();
+                // Verifica se a data da planilha corresponde à data atual
+                const dataTreinamentoFormatada = new Date(dataTreinamento.split("/").reverse().join("-")).toISOString().split('T')[0]; // Formato 'yyyy-mm-dd'
+                return dataTreinamentoFormatada === dataAtualFormatada;
             });
 
             console.log("Fornecedores filtrados:", fornecedoresFiltrados);
 
-            // Preencher lista suspensa com os fornecedores filtrados
+            // Preenche a lista suspensa com os fornecedores filtrados
             preencherSelect(
                 fornecedoresFiltrados.map((registro) => [registro[1]]), // Apenas fornecedores
                 "fornecedor2" // ID do novo select
