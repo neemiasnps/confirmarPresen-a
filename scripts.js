@@ -83,7 +83,7 @@ function loadSheetData() {
         });
 }
 
-// Função genérica para preencher um select
+/*/ Função genérica para preencher um select
 function preencherSelect(valores, selectId) {
     const selectElement = document.getElementById(selectId);
     selectElement.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
@@ -94,6 +94,26 @@ function preencherSelect(valores, selectId) {
         selectElement.appendChild(option);
     });
     M.FormSelect.init(selectElement);
+}*/
+
+// Função para preencher a lista suspensa
+function preencherSelect(opcoes, selectId) {
+    const select = document.getElementById(selectId);
+    if (!select) return console.error(`Select com ID '${selectId}' não encontrado.`);
+
+    // Limpa as opções existentes
+    select.innerHTML = '<option value="" disabled selected>Selecione o fornecedor</option>';
+
+    // Adiciona novas opções
+    opcoes.forEach(([fornecedor]) => {
+        const option = document.createElement("option");
+        option.value = fornecedor;
+        option.textContent = fornecedor;
+        select.appendChild(option);
+    });
+
+    // Atualiza o select do Materialize
+    M.FormSelect.init(select);
 }
 
 // Função para carregar nomes de colaboradores com base na loja selecionada
