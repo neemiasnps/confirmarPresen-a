@@ -102,7 +102,7 @@ function preencherSelect(opcoes, selectId) {
     if (!select) return console.error(`Select com ID '${selectId}' não encontrado.`);
 
     // Limpa as opções existentes
-    select.innerHTML = '<option value="" disabled selected>Selecione o fornecedor</option>';
+    select.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
 
     // Adiciona novas opções
     opcoes.forEach(([fornecedor]) => {
@@ -134,6 +134,7 @@ function loadNomes(lojaSelecionada) {
 }
 
 // Função para carregar fornecedores com base na loja e data atual
+// Função para carregar fornecedores com base na loja e data atual
 function loadFornecedoresPorLojaEData(lojaSelecionada) {
     const range = "Página1!A2:C"; // Colunas A (Loja), B (Fornecedor), C (Data)
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID_FORNECEDORES_2}/values/${range}?key=${API_KEY}`;
@@ -150,12 +151,6 @@ function loadFornecedoresPorLojaEData(lojaSelecionada) {
             // Filtra os fornecedores com base na loja e na data atual
             const fornecedoresFiltrados = registros.filter((registro) => {
                 const [loja, fornecedor, dataTreinamento] = registro;
-
-                // Log para verificar os valores de loja e fornecedor
-                console.log("Loja selecionada:", lojaSelecionada);
-                console.log("Loja da planilha:", loja.trim());
-                console.log("Data do treinamento na planilha:", dataTreinamento.trim());
-                console.log("Data atual formatada:", dataAtualFormatada);
 
                 // Verifica se a loja corresponde
                 if (loja.trim() !== lojaSelecionada) return false;
@@ -175,6 +170,24 @@ function loadFornecedoresPorLojaEData(lojaSelecionada) {
                 fornecedoresFiltrados.map((registro) => [registro[1]]), // Apenas fornecedores
                 "fornecedor2" // ID do novo select
             );
+
+            // Adiciona o evento para preencher o campo de data quando o fornecedor for selecionado
+            const selectFornecedor = document.getElementById("fornecedor2");
+            selectFornecedor.addEventListener("change", function () {
+                const fornecedorSelecionado = selectFornecedor.value;
+
+                // Encontra o fornecedor selecionado e preenche a data
+                const fornecedorData = fornecedoresFiltrados.find((registro) => registro[1] === fornecedorSelecionado);
+                if (fornecedorData) {
+                    const [loja, fornecedor, dataTreinamento] = fornecedorData;
+                    const [dia, mes, ano] = dataTreinamento.split("/"); // Divide a data em dia, mês e ano
+                    const dataFormatada = `${ano}-${mes}-${dia}`; // Formato 'yyyy-mm-dd'
+
+                    // Preenche o campo de data
+                    const campoData = document.getElementById("data");
+                    campoData.value = dataFormatada; // Preenche com a data no formato 'yyyy-mm-dd'
+                }
+            });
         })
         .catch((error) => {
             console.error("Erro ao carregar fornecedores:", error);
