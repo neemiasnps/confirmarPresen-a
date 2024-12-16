@@ -99,7 +99,7 @@ function preencherSelect(valores, selectId) {
 // Função para preencher a lista suspensa
 function preencherSelect(opcoes, selectId) {
     const select = document.getElementById(selectId);
-    if (!select) return console.error(Select com ID '${selectId}' não encontrado.);
+    if (!select) return console.error(`Select com ID '${selectId}' não encontrado.`);
 
     // Limpa as opções existentes
     select.innerHTML = '<option value="" disabled selected>Selecione uma opção</option>';
