@@ -64,7 +64,7 @@ function authenticateAndSend(formData) {
 }
 
 // Função para carregar dados da planilha
-function loadSheetData() {
+/*function loadSheetData() {
     const lojasRange = "Lojas!B2:B";
     const fornecedoresRange = "Fornecedores!A2:A";
     const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
@@ -81,7 +81,25 @@ function loadSheetData() {
             console.error("Erro ao carregar dados da planilha:", error);
             alert("Erro ao carregar dados. Tente novamente mais tarde.");
         });
+}*/
+
+function loadSheetData() {
+    const lojasRange = "Lojas!B2:B";
+    const urlBase = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
+
+    // Buscar apenas os dados de "Lojas"
+    fetch(`${urlBase}${lojasRange}?key=${API_KEY}`)
+        .then((res) => res.json())
+        .then((lojasResponse) => {
+            // Preencher o select com os valores das lojas
+            preencherSelect(lojasResponse.values || [], "loja");
+        })
+        .catch((error) => {
+            console.error("Erro ao carregar dados da planilha de lojas:", error);
+            alert("Erro ao carregar dados das lojas. Tente novamente mais tarde.");
+        });
 }
+
 
 /*/ Função genérica para preencher um select
 function preencherSelect(valores, selectId) {
