@@ -31,6 +31,7 @@ function initializeTokenClient() {
         console.error("Erro: O script GSI não foi carregado.");
         return;
     }
+
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
@@ -48,6 +49,12 @@ function initializeTokenClient() {
 function authenticateAndSend(formData) {
     if (!gapiInitialized) {
         alert("Erro: O GAPI Client não foi inicializado.");
+        return;
+    }
+
+    // Verifica se o tokenClient está corretamente inicializado
+    if (!tokenClient) {
+        console.error("Erro: tokenClient não foi inicializado.");
         return;
     }
 
