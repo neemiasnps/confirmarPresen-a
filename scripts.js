@@ -250,11 +250,11 @@ document.getElementById("loja").addEventListener("change", (event) => {
 function limparFormulario() {
     document.getElementById("loja").value = "";
     document.getElementById("nome").value = "";
-    document.getElementById("fornecedor").value = "";
+    document.getElementById("fornecedor2").value = "";
     document.getElementById("data").value = "";
     M.FormSelect.init(document.querySelectorAll("select"));
     M.FormSelect.init(document.getElementById("loja"));
-    M.FormSelect.init(document.getElementById("fornecedor"));
+    M.FormSelect.init(document.getElementById("fornecedor2"));
 }
 
 // Inicialização da aplicação
@@ -285,7 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const loja = document.getElementById("loja").value;
         const nome = document.getElementById("nome").value;
-        const fornecedor = document.getElementById("fornecedor").value;
+        const fornecedor = document.getElementById("fornecedor2").value;
         const data = document.getElementById("data").value;
 
         if (loja && nome && fornecedor && data) {
