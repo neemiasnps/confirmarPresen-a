@@ -180,7 +180,8 @@ function loadFornecedoresPorLojaEData(lojaSelecionada) {
                 if (fornecedorData) {
                     const [loja, fornecedor, dataTreinamento] = fornecedorData;
                     const [dia, mes, ano] = dataTreinamento.split("/"); // Divide a data em dia, mês e ano
-                    const dataFormatada = `${ano}-${mes}-${dia}`; // Formato 'yyyy-mm-dd'
+                    //const dataFormatada = `${ano}-${mes}-${dia}`; // Formato 'yyyy-mm-dd'
+                    const dataFormatada = `${dia}-${mes}-${ano}`; 
 
                     // Preenche o campo de data
                     const campoData = document.getElementById("data");
